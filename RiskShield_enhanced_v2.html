@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RiskShield – Digital Risk Protection (Social &amp; App Monitoring)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+tailwind.config = { theme: { extend: { colors: { primary: '#2563eb', secondary: '#1e40af', accent: '#f97316', dark: '#0f172a', light: '#f8fafc' } } } }
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+.mobile-menu { display: none; }
+.mobile-menu.active { display: block; }
+.risk-high { background-color: #fee2e2; color: #b91c1c; }
+.risk-medium { background-color: #fef3c7; color: #92400e; }
+.risk-low { background-color: #dcfce7; color: #166534; }
+.tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+details > summary { cursor: pointer; }
+.bar { height: 10px; border-radius: 9999px; background: #2563eb; }
+</style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center"><i class="fas fa-shield-alt text-white text-xl"></i></div>
+      <div><h1 class="text-2xl font-bold text-dark leading-none">RiskShield</h1><p class="text-xs text-gray-500">Social &amp; App Monitoring</p></div>
+    </div>
+    <nav class="hidden lg:flex space-x-5 text-sm" id="main-nav">
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="brand">Brand Profile</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="social">Social</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="app">Apps</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="reports">Reports</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="logs">Logs</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="arch">Architecture</button>
+      <button class="nav-btn font-medium text-dark hover:text-primary py-2" data-tab="settings">Settings</button>
+    </nav>
+    <div class="flex items-center space-x-3">
+      <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary font-medium" data-action="get-started">Get Started</button>
+      <button class="lg:hidden text-dark" id="menu-toggle" aria-label="Menu"><i class="fas fa-bars text-2xl"></i></button>
+    </div>
+  </div>
+  <div class="lg:hidden mobile-menu" id="mobile-menu">
+    <div class="px-4 py-2 space-y-1 bg-white border-t">
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="brand">Brand Profile</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="social">Social Monitoring</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="app">App Monitoring</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="reports">Reports</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="logs">System Logs</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="arch">Architecture</button>
+      <button class="nav-btn block w-full text-left font-medium text-dark py-2" data-tab="settings">Settings</button>
+    </div>
+  </div>
+</header>
+
+<!-- Active brand bar -->
+<div class="bg-white border-b">
+  <div class="container mx-auto px-4 py-2 flex flex-wrap items-center gap-3">
+    <label for="active-brand" class="text-sm text-gray-600">Active brand</label>
+    <select id="active-brand" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"></select>
+    <button data-action="run-all" class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-slate-700"><i class="fas fa-play mr-1"></i>Run full scan</button>
+    <span id="bar-hint" class="text-xs text-gray-500"></span>
+  </div>
+</div>
+
+<main class="container mx-auto px-4 py-8">
+
+<!-- ========== DASHBOARD ========== -->
+<section id="tab-dashboard" class="tab-content">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">Dashboard Overview</h2><p class="text-gray-600">Impersonation risk for the active brand across social platforms and app stores.</p></div>
+
+  <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">Brands registered</p><p class="text-2xl font-bold text-dark" id="st-brands">0</p></div>
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">Items scanned</p><p class="text-2xl font-bold text-dark" id="st-scanned">0</p></div>
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">Potential threats</p><p class="text-2xl font-bold text-orange-500" id="st-threats">0</p></div>
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">High-risk findings</p><p class="text-2xl font-bold text-red-500" id="st-high">0</p></div>
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">Official assets excluded</p><p class="text-2xl font-bold text-green-600" id="st-official">0</p></div>
+    <div class="bg-white rounded-xl p-4 shadow-md"><p class="text-gray-500 text-xs">Sources healthy</p><p class="text-2xl font-bold text-dark" id="st-sources">–</p></div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2">
+      <h3 class="text-lg font-bold text-dark mb-4">Getting started</h3>
+      <ol id="onboard" class="space-y-3 text-sm"></ol>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h3 class="text-lg font-bold text-dark mb-4">Threat summary</h3>
+      <div class="grid grid-cols-3 gap-3 text-center mb-4">
+        <div class="border rounded-lg p-3"><p class="text-2xl font-bold text-red-500" id="lv-high">0</p><p class="text-xs text-gray-600">High</p></div>
+        <div class="border rounded-lg p-3"><p class="text-2xl font-bold text-yellow-500" id="lv-med">0</p><p class="text-xs text-gray-600">Medium</p></div>
+        <div class="border rounded-lg p-3"><p class="text-2xl font-bold text-green-500" id="lv-low">0</p><p class="text-xs text-gray-600">Low</p></div>
+      </div>
+      <p class="text-sm text-gray-600">Social: <strong id="ch-social">0</strong> &nbsp;·&nbsp; Apps: <strong id="ch-app">0</strong></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h3 class="text-lg font-bold text-dark mb-4">Detections by technique</h3>
+      <div id="tech-bars" class="space-y-3 text-sm"></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h3 class="text-lg font-bold text-dark mb-4">Source health</h3>
+      <div id="source-health" class="space-y-2 text-sm"></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <h3 class="text-lg font-bold text-dark mb-4">Recent activity</h3>
+      <div id="recent-activity" class="space-y-3 text-sm"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== BRAND PROFILE ========== -->
+<section id="tab-brand" class="tab-content hidden">
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div><h2 class="text-3xl font-bold text-dark mb-1">Brand Profile</h2><p class="text-gray-600">Define your legitimate assets. Everything here is excluded from detection and used as the reference for similarity.</p></div>
+    <button data-action="demo-brand" class="border border-primary text-primary px-4 py-2 rounded-lg font-medium hover:bg-blue-50"><i class="fas fa-flask mr-2"></i>Load demo brand (NovaPay)</button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-4">Identity</h3>
+        <div id="b-errors" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm"></div>
+        <div id="b-warnings" class="hidden mb-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium text-gray-700 mb-1" for="b-name">Company / brand name *</label><input id="b-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="e.g. NovaPay"></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1" for="b-domains">Official website domain(s) *</label><input id="b-domains" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="novapay.com, novapay.in"></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1" for="b-aliases">Aliases / short names</label><input id="b-aliases" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Nova Pay, Nova"></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1" for="b-identifiers">Other identifiers (products, slogans)</label><input id="b-identifiers" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="NovaCard, NovaRewards"></div>
+          <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1" for="b-desc">Official description / tagline</label><textarea id="b-desc" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Used to spot copied descriptions in fake pages and apps"></textarea></div>
+          <div><label class="block text-sm font-medium text-gray-700 mb-1" for="b-logo-url">Official logo URL</label><input id="b-logo-url" type="url" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="https://novapay.com/logo.png"></div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="b-logo-file">…or upload logo</label>
+            <input id="b-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="w-full px-2 py-1.5 border border-gray-300 rounded-lg bg-white text-sm">
+            <p class="text-xs text-gray-500 mt-1">PNG, JPG, WEBP, GIF or SVG · max 1 MB · fingerprinted in your browser</p>
+            <div id="b-logo-preview-wrap" class="hidden mt-2 flex items-center gap-3"><img id="b-logo-preview" alt="Logo preview" class="w-12 h-12 object-contain border rounded-lg bg-white p-1"><span id="b-logo-hash" class="text-xs text-gray-500 break-all"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center justify-between mb-3"><h3 class="text-lg font-bold text-dark">Official social accounts</h3><button data-action="add-social" class="text-sm text-primary font-medium"><i class="fas fa-plus mr-1"></i>Add account</button></div>
+        <p class="text-xs text-gray-500 mb-3">Accounts listed here are never flagged. Enter a handle (@novapay) or the profile URL.</p>
+        <div id="b-social-rows" class="space-y-2"></div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center justify-between mb-3"><h3 class="text-lg font-bold text-dark">Official mobile applications</h3><button data-action="add-app" class="text-sm text-primary font-medium"><i class="fas fa-plus mr-1"></i>Add app</button></div>
+        <p class="text-xs text-gray-500 mb-3">Package / bundle IDs and publisher names are how official apps are told apart from impostors.</p>
+        <div id="b-app-rows" class="space-y-2"></div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button data-action="save-brand" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary">Save brand profile</button>
+        <button data-action="clear-brand" class="border border-gray-300 px-6 py-3 rounded-lg font-medium">Clear form</button>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-2">Saved brands</h3>
+        <div id="brand-list" class="space-y-2 text-sm"></div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-2">Profile completeness</h3>
+        <div id="completeness" class="text-sm"></div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-2">Look-alikes we watch for</h3>
+        <p class="text-xs text-gray-500 mb-3">Generated from the active brand. Detection matches these patterns, not an exact list.</p>
+        <div id="variant-preview" class="space-y-2 text-sm"></div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-sm text-gray-700">
+        <h3 class="text-lg font-bold text-dark mb-2">How the profile drives detection</h3>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Handles, package IDs, publishers</strong> → official assets excluded before scoring</li>
+          <li><strong>Name, aliases, identifiers</strong> → look-alike name matching</li>
+          <li><strong>Logo</strong> → visual fingerprint comparison</li>
+          <li><strong>Domains</strong> → look-alike / foreign-domain link checks</li>
+          <li><strong>Description</strong> → copied-text similarity</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SOCIAL ========== -->
+<section id="tab-social" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">Social Media Monitoring</h2><p class="text-gray-600">Fake profiles, fake company pages and scam accounts using the brand's identity.</p></div>
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div id="social-sources" class="flex flex-wrap gap-2"></div>
+      <button data-action="run-social" id="run-social" class="bg-primary text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-secondary"><i class="fas fa-search mr-2"></i>Run social scan</button>
+    </div>
+    <p id="social-msg" role="status" aria-live="polite" class="text-sm text-gray-600">Save or load a brand profile, then run a scan.</p>
+    <div id="social-banner" class="hidden mt-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+    <div class="overflow-x-auto"><table class="min-w-full">
+      <thead class="bg-gray-100"><tr>
+        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Account</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Platform</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Risk</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Signals</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th><th class="py-3 px-4"></th></tr></thead>
+      <tbody id="social-body" class="divide-y divide-gray-200"></tbody></table></div>
+    <p id="social-empty" class="p-6 text-center text-gray-500 hidden">No suspicious profiles for the active brand yet.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <details class="bg-white rounded-xl shadow-md p-6"><summary class="font-bold text-dark">Official accounts excluded (<span id="social-official-count">0</span>)</summary><ul id="social-official" class="mt-3 text-sm space-y-1 text-gray-700"></ul></details>
+    <details class="bg-white rounded-xl shadow-md p-6"><summary class="font-bold text-dark">Reviewed but not flagged (<span id="social-cleared-count">0</span>)</summary><ul id="social-cleared" class="mt-3 text-sm space-y-1 text-gray-700"></ul></details>
+  </div>
+  <details class="bg-white rounded-xl shadow-md p-6">
+    <summary class="font-bold text-dark">Manual check – analyse one suspicious profile</summary>
+    <p class="text-sm text-gray-600 mt-2 mb-4">Runs the same detection engine on details you copy from a real profile. Nothing is fetched from the platform.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div><label class="block text-xs text-gray-600 mb-1">Platform</label><select id="ms-platform" class="w-full px-3 py-2 border rounded-lg"><option value="x">X / Twitter</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="linkedin">LinkedIn</option></select></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Display name *</label><input id="ms-name" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Handle or profile URL *</label><input id="ms-handle" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Link in bio / website</label><input id="ms-link" class="w-full px-3 py-2 border rounded-lg" placeholder="https://…"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Account age (days)</label><input id="ms-age" type="number" min="0" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Profile image (optional)</label><input id="ms-logo" type="file" accept="image/*" class="w-full px-2 py-1.5 border rounded-lg text-sm bg-white"></div>
+      <div class="md:col-span-3"><label class="block text-xs text-gray-600 mb-1">Bio text</label><textarea id="ms-bio" rows="2" class="w-full px-3 py-2 border rounded-lg"></textarea></div>
+      <label class="flex items-center gap-2 text-sm"><input id="ms-verified" type="checkbox"> Has platform verification badge</label>
+    </div>
+    <button data-action="manual-social" class="mt-4 bg-primary text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-secondary">Analyse profile</button>
+    <div id="ms-result" class="hidden mt-4 rounded-lg border p-4 text-sm" role="status" aria-live="polite"></div>
+  </details>
+</section>
+
+<!-- ========== APPS ========== -->
+<section id="tab-app" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">App Store Monitoring</h2><p class="text-gray-600">Suspicious apps with look-alike names, copied logos, different publishers or copied descriptions.</p></div>
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div id="app-sources" class="flex flex-wrap gap-2"></div>
+      <button data-action="run-app" id="run-app" class="bg-primary text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-secondary"><i class="fas fa-mobile-alt mr-2"></i>Run app store scan</button>
+    </div>
+    <p id="app-msg" role="status" aria-live="polite" class="text-sm text-gray-600">Save or load a brand profile, then run a scan.</p>
+    <div id="app-banner" class="hidden mt-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm"></div>
+  </div>
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+    <div class="overflow-x-auto"><table class="min-w-full">
+      <thead class="bg-gray-100"><tr>
+        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">App</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Store</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Risk</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Signals</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th><th class="py-3 px-4"></th></tr></thead>
+      <tbody id="app-body" class="divide-y divide-gray-200"></tbody></table></div>
+    <p id="app-empty" class="p-6 text-center text-gray-500 hidden">No suspicious apps for the active brand yet.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <details class="bg-white rounded-xl shadow-md p-6"><summary class="font-bold text-dark">Official apps excluded (<span id="app-official-count">0</span>)</summary><ul id="app-official" class="mt-3 text-sm space-y-1 text-gray-700"></ul></details>
+    <details class="bg-white rounded-xl shadow-md p-6"><summary class="font-bold text-dark">Reviewed but not flagged (<span id="app-cleared-count">0</span>)</summary><ul id="app-cleared" class="mt-3 text-sm space-y-1 text-gray-700"></ul></details>
+  </div>
+  <details class="bg-white rounded-xl shadow-md p-6">
+    <summary class="font-bold text-dark">Manual check – analyse one suspicious app</summary>
+    <p class="text-sm text-gray-600 mt-2 mb-4">Copy the details from a store listing. Nothing is fetched from the store.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div><label class="block text-xs text-gray-600 mb-1">Store</label><select id="ma-store" class="w-full px-3 py-2 border rounded-lg"><option value="googleplay">Google Play</option><option value="appstore">Apple App Store</option></select></div>
+      <div><label class="block text-xs text-gray-600 mb-1">App name *</label><input id="ma-name" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Publisher / developer *</label><input id="ma-publisher" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Package / bundle ID</label><input id="ma-package" class="w-full px-3 py-2 border rounded-lg" placeholder="com.example.app"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Developer website</label><input id="ma-link" class="w-full px-3 py-2 border rounded-lg" placeholder="https://…"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">App icon (optional)</label><input id="ma-logo" type="file" accept="image/*" class="w-full px-2 py-1.5 border rounded-lg text-sm bg-white"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Permissions (comma separated)</label><input id="ma-perms" class="w-full px-3 py-2 border rounded-lg" placeholder="READ_SMS, ACCESSIBILITY"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Days since first published</label><input id="ma-age" type="number" min="0" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-xs text-gray-600 mb-1">Downloads</label><input id="ma-downloads" type="number" min="0" class="w-full px-3 py-2 border rounded-lg"></div>
+      <div class="md:col-span-3"><label class="block text-xs text-gray-600 mb-1">Store description</label><textarea id="ma-desc" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea></div>
+    </div>
+    <button data-action="manual-app" class="mt-4 bg-primary text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-secondary">Analyse app</button>
+    <div id="ma-result" class="hidden mt-4 rounded-lg border p-4 text-sm" role="status" aria-live="polite"></div>
+  </details>
+</section>
+
+<!-- ========== REPORTS ========== -->
+<section id="tab-reports" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">Threat Reports</h2><p class="text-gray-600">Review, triage and act on findings for the active brand.</p></div>
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+      <input id="r-search" type="search" placeholder="Search findings…" class="md:col-span-2 px-4 py-2 border border-gray-300 rounded-lg">
+      <select id="r-channel" class="px-3 py-2 border border-gray-300 rounded-lg"><option value="All">All channels</option><option value="social">Social</option><option value="app">Apps</option></select>
+      <select id="r-level" class="px-3 py-2 border border-gray-300 rounded-lg"><option value="All">All risk levels</option><option>High</option><option>Medium</option><option>Low</option></select>
+      <select id="r-status" class="px-3 py-2 border border-gray-300 rounded-lg"></select>
+    </div>
+    <div class="flex items-center justify-between mt-3"><p id="r-count" class="text-sm text-gray-600"></p><button data-action="export-findings" class="border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium">Export CSV</button></div>
+  </div>
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="overflow-x-auto"><table class="min-w-full">
+      <thead class="bg-gray-100"><tr>
+        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Finding</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Channel</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Risk</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">First seen</th><th class="py-3 px-4"></th></tr></thead>
+      <tbody id="r-body" class="divide-y divide-gray-200"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ========== LOGS ========== -->
+<section id="tab-logs" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">System Logs</h2><p class="text-gray-600">Audit trail of brand profile changes, scans, source health and finding status updates.</p></div>
+  <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-6 text-sm">Prototype note: logs are stored in this browser only and are lost if site data is cleared.</div>
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <input id="logs-search" type="search" placeholder="Search logs…" class="px-4 py-2 border border-gray-300 rounded-lg">
+      <select id="logs-type" class="px-4 py-2 border border-gray-300 rounded-lg"><option value="All">All event types</option><option value="Brand">Brand events</option><option value="Scan">Scan events</option><option value="Source">Source health</option><option value="Finding">Finding / status events</option><option value="System">System events</option></select>
+      <div class="flex gap-2"><button data-action="refresh-logs" class="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-medium">Refresh</button><button data-action="export-logs" class="flex-1 border border-gray-300 px-4 py-2 rounded-lg font-medium">Export CSV</button></div>
+    </div>
+  </div>
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="overflow-x-auto"><table class="min-w-full">
+      <thead class="bg-gray-100"><tr><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Timestamp</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Type</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Event</th><th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">Result</th></tr></thead>
+      <tbody id="logs-body" class="divide-y divide-gray-200"></tbody></table></div>
+    <p id="logs-empty" class="hidden p-6 text-center text-gray-500">No logs match. Save a brand profile or run a scan to create events.</p>
+  </div>
+</section>
+
+<!-- ========== ARCHITECTURE ========== -->
+<section id="tab-arch" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">Architecture &amp; Approach</h2><p class="text-gray-600">Data sources → detection logic → storage, and exactly where official assets are excluded.</p></div>
+  <div class="bg-white rounded-xl shadow-md p-4 mb-6 overflow-x-auto"><div id="arch-svg" style="min-width:760px"></div></div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-6 text-sm text-gray-700">
+      <h3 class="text-lg font-bold text-dark mb-3">How detection works</h3>
+      <ol class="list-decimal pl-5 space-y-2">
+        <li><strong>Official assets removed first.</strong> Handles, package/bundle IDs, publisher names and domains from the brand profile are matched before any scoring, so official accounts and apps are never flagged.</li>
+        <li><strong>Look-alike names.</strong> Text is normalised (case, accents, separators), mapped through a homoglyph table (0→o, 1→l/i, Cyrillic а/е/о…), then compared by edit distance with transposition (character swaps), separator changes and added words. Support/trust words (support, official, wallet, refund…) score high; community words (fan, news, unofficial) score low.</li>
+        <li><strong>Avoiding over-flagging.</strong> A candidate needs a brand-related signal (name, logo, domain, description or package) before anything else counts. Short brand names (&lt;5 chars) match only exactly; 5-letter names only on swaps. Verified badges reduce score. Anything marked “false positive” goes on an allow-list.</li>
+        <li><strong>Logo.</strong> A 64-bit difference hash of the official logo is compared with candidate images (Hamming distance).</li>
+        <li><strong>Links &amp; text.</strong> Look-alike or foreign domains, shorteners, punycode, risky TLDs; copied description wording; scam phrasing (OTP requests, fees, giveaways).</li>
+        <li><strong>Apps.</strong> Publisher vs. official publisher (including look-alike publisher names), brand-like package IDs owned by someone else, risky permissions, new / low-install apps.</li>
+        <li><strong>Explainable score.</strong> Every finding lists each signal with its points, so a reviewer can verify it.</li>
+      </ol>
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl shadow-md p-6 text-sm text-gray-700">
+        <h3 class="text-lg font-bold text-dark mb-3">Prototype vs. production</h3>
+        <table class="w-full text-left"><thead><tr class="border-b"><th class="py-2 pr-3">Layer</th><th class="py-2 pr-3">This prototype</th><th class="py-2">Production</th></tr></thead><tbody class="divide-y">
+          <tr><td class="py-2 pr-3 font-medium">Data sources</td><td class="py-2 pr-3">Simulated feed + JSON import + manual check</td><td class="py-2">Approved platform / store APIs and threat-intel feeds via a backend</td></tr>
+          <tr><td class="py-2 pr-3 font-medium">Detection</td><td class="py-2 pr-3">Runs in the browser (real rules)</td><td class="py-2">Same rules as a service; add image-embedding logo match</td></tr>
+          <tr><td class="py-2 pr-3 font-medium">Storage</td><td class="py-2 pr-3">localStorage</td><td class="py-2">Postgres + object storage, per-tenant</td></tr>
+          <tr><td class="py-2 pr-3 font-medium">Outages</td><td class="py-2 pr-3">Per-source status, partial results, retry</td><td class="py-2">Queues, retries, backoff, alerting</td></tr>
+        </tbody></table>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-sm text-gray-700">
+        <h3 class="text-lg font-bold text-dark mb-3">2-minute demo script</h3>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Brand Profile → <em>Load demo brand</em> (shows validation, logo fingerprint, official assets).</li>
+          <li>Social → <em>Run social scan</em>: impostors flagged, official accounts excluded, fan page not flagged.</li>
+          <li>Apps → <em>Run app store scan</em>: wallet clone, typo-squat, look-alike publisher.</li>
+          <li>Settings → simulate a Facebook outage, rescan: partial-results banner, retry.</li>
+          <li>Open a finding: evidence breakdown + takedown draft. Mark one false positive.</li>
+          <li>Social → Manual check with <em>n0vapay_support</em> to show live look-alike detection.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SETTINGS ========== -->
+<section id="tab-settings" class="tab-content hidden">
+  <div class="mb-6"><h2 class="text-3xl font-bold text-dark mb-1">Settings</h2><p class="text-gray-600">Detection sensitivity, data sources and local data.</p></div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="space-y-6 lg:col-span-2">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-3">Data sources</h3>
+        <p class="text-sm text-gray-600 mb-3">Live platform APIs are not connected in this prototype. Each source reads the simulated feed plus any imported records. Use “Simulate outage” to see graceful handling of an unavailable source.</p>
+        <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-100"><tr><th class="py-2 px-3 text-left">Source</th><th class="py-2 px-3 text-left">Enabled</th><th class="py-2 px-3 text-left">Simulate outage</th><th class="py-2 px-3 text-left">Mode</th></tr></thead><tbody id="s-sources" class="divide-y"></tbody></table></div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-3">Import real candidate data (JSON)</h3>
+        <p class="text-sm text-gray-600 mb-2">Paste candidates you collected from platforms or an export. They are scanned against the active brand together with the simulated feed.</p>
+        <textarea id="s-import" rows="7" class="w-full px-3 py-2 border rounded-lg font-mono text-xs" placeholder='[{"type":"social","platform":"instagram","name":"…","handle":"…"}]'></textarea>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button data-action="import" class="bg-primary text-white px-4 py-2 rounded-lg font-medium">Import</button>
+          <button data-action="import-sample" class="border border-gray-300 px-4 py-2 rounded-lg font-medium">Insert sample</button>
+          <button data-action="clear-import" class="border border-gray-300 px-4 py-2 rounded-lg font-medium">Remove imported records</button>
+        </div>
+        <p id="s-import-msg" class="text-sm mt-2 text-gray-600" role="status"></p>
+      </div>
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-3">Sensitivity</h3>
+        <div class="space-y-2 text-sm" id="s-sens"></div>
+        <p class="text-xs text-gray-500 mt-3">Re-run scans after changing sensitivity.</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-bold text-dark mb-3">Local data</h3>
+        <p class="text-sm text-gray-600 mb-3">Everything is stored in this browser. Allow-listed items: <strong id="s-allow">0</strong>.</p>
+        <button data-action="reset" class="w-full bg-red-50 text-red-700 py-2.5 rounded-lg font-semibold hover:bg-red-100">Reset all local data</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Modal -->
+<div id="modal" class="hidden fixed inset-0 z-40 bg-black/50 overflow-y-auto" role="dialog" aria-modal="true">
+  <div class="min-h-full flex items-start justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl my-8">
+      <div class="flex items-center justify-between px-6 py-4 border-b"><h3 class="font-bold text-lg text-dark" id="modal-title">Finding</h3><button data-action="close-modal" class="text-gray-500 text-xl" aria-label="Close">&times;</button></div>
+      <div id="modal-body" class="p-6 text-sm"></div>
+    </div>
+  </div>
+</div>
+<div id="toast" class="hidden"></div>
+
+<!-- ================= DETECTION ENGINE (pure functions, no DOM) ================= -->
+<script id="engine">
+const RS = (() => {
+  const SOURCES = [
+    { id: 'x', type: 'social', label: 'X / Twitter' }, { id: 'instagram', type: 'social', label: 'Instagram' },
+    { id: 'facebook', type: 'social', label: 'Facebook' }, { id: 'linkedin', type: 'social', label: 'LinkedIn' },
+    { id: 'googleplay', type: 'app', label: 'Google Play' }, { id: 'appstore', type: 'app', label: 'Apple App Store' }
+  ];
+  const PLAT = { x: 'x', twitter: 'x', 'x / twitter': 'x', 'x/twitter': 'x', instagram: 'instagram', facebook: 'facebook', linkedin: 'linkedin', googleplay: 'googleplay', 'google play': 'googleplay', appstore: 'appstore', 'app store': 'appstore', 'apple app store': 'appstore' };
+  const platId = v => PLAT[String(v || '').trim().toLowerCase()] || '';
+  const platLabel = id => (SOURCES.find(s => s.id === id) || { label: id }).label;
+  const TH = { balanced: { low: 25, med: 45, high: 70 }, strict: { low: 15, med: 35, high: 60 }, lenient: { low: 35, med: 55, high: 80 } };
+  const levelOf = (score, th) => { th = th || TH.balanced; return score >= th.high ? 'High' : score >= th.med ? 'Medium' : 'Low'; };
+
+  const HOMO = { '0': 'o', '1': 'l', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l',
+    '\u0430': 'a', '\u0435': 'e', '\u043e': 'o', '\u0440': 'p', '\u0441': 'c', '\u0445': 'x', '\u0456': 'i', '\u0455': 's', '\u0443': 'y', '\u04cf': 'l', '\u0131': 'i' };
+  const RISKY = ['support', 'help', 'customercare', 'care', 'service', 'official', 'verify', 'verification', 'login', 'signin', 'secure', 'security', 'wallet', 'reward', 'giveaway', 'claim', 'bonus', 'refund', 'offer', 'promo', 'payment', 'recovery', 'account', 'team', 'career', 'hiring', 'recruit', 'jobs', 'invest', 'trading', 'loan', 'cashback'];
+  const NEUTRAL = ['fan', 'community', 'unofficial', 'news', 'meme', 'review', 'blog', 'forum', 'club', 'tribute', 'lovers', 'stories', 'discussion', 'alumni'];
+
+  const nb = s => String(s == null ? '' : s).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const raw = s => nb(s).replace(/[^a-z0-9\u0400-\u04ff]/g, '');
+  const skel = (s, alt) => [...nb(s)].map(c => (alt && (c === '1' || c === '|' || c === '!')) ? 'i' : (HOMO[c] || c)).join('').replace(/[^a-z0-9]/g, '');
+  const skAll = s => { const a = skel(s, false), b = skel(s, true); return a === b ? [a] : [a, b]; };
+  const sk = s => skel(s, false);
+
+  function dl(a, b) {
+    const al = a.length, bl = b.length; if (!al) return bl; if (!bl) return al;
+    const d = Array.from({ length: al + 1 }, () => new Array(bl + 1).fill(0));
+    for (let i = 0; i <= al; i++) d[i][0] = i; for (let j = 0; j <= bl; j++) d[0][j] = j;
+    for (let i = 1; i <= al; i++) for (let j = 1; j <= bl; j++) {
+      const c = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+    return d[al][bl];
+  }
+  function isAdjSwap(a, b) {
+    if (a.length !== b.length) return false; const diff = [];
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) diff.push(i);
+    return diff.length === 2 && diff[1] === diff[0] + 1 && a[diff[0]] === b[diff[1]] && a[diff[1]] === b[diff[0]];
+  }
+  // Fuzzy matching rules that limit over-flagging: <5 chars exact only; 5 chars swaps only; 6-9 one edit; 10+ two edits.
+  function fuzzy(b, c) {
+    const L = b.length; if (L < 5 || b === c) return null;
+    const d = dl(b, c); if (!d) return null;
+    if (L === 5) return isAdjSwap(b, c) ? { kind: 'swap', dist: 1 } : null;
+    const allowed = L >= 10 ? 2 : 1;
+    if (d > allowed) return null;
+    return { kind: isAdjSwap(b, c) ? 'swap' : 'typo', dist: d };
+  }
+  function relate(brandStr, candStr) {
+    const rb = raw(brandStr), rc = raw(candStr);
+    if (!rb || !rc) return null;
+    if (rb === rc) return { kind: nb(brandStr).trim() === nb(candStr).trim() ? 'exact' : 'spacing' };
+    const bks = skAll(brandStr), cks = skAll(candStr);
+    for (const b of bks) for (const c of cks) if (b && b === c) return { kind: 'homoglyph' };
+    for (const b of bks) for (const c of cks) { const f = fuzzy(b, c); if (f) return f; }
+    return null;
+  }
+  const toks = s => String(s || '').replace(/([a-z])([A-Z])/g, '$1 $2').split(/[\s_\-.,/&+:;()\[\]{}"'#]+/).filter(Boolean);
+  function classifyExtras(extra) {
+    const e = nb(extra).replace(/[^a-z0-9]/g, '').replace(/unofficial/g, 'fan');
+    if (!e) return null;
+    const r = RISKY.filter(w => e.includes(w)); if (r.length) return { cls: 'risky', words: r };
+    const n = NEUTRAL.filter(w => e.includes(w)); if (n.length) return { cls: 'neutral', words: n };
+    return { cls: 'other', words: [] };
+  }
+  function describeWhole(rel, v) {
+    switch (rel.kind) {
+      case 'exact': return { pts: 45, tag: 'Exact name clone', label: `Name is identical to the brand "${v}"` };
+      case 'spacing': return { pts: 38, tag: 'Spacing / separator change', label: `Same letters as "${v}" with spacing, dots or underscores changed` };
+      case 'homoglyph': return { pts: 45, tag: 'Homoglyph substitution', label: `Look-alike characters used in place of letters in "${v}" (e.g. 0→o, 1→l, Cyrillic а/е/о)` };
+      case 'swap': return { pts: 40, tag: 'Character swap', label: `Two adjacent characters swapped compared with "${v}"` };
+      default: return { pts: rel.dist > 1 ? 26 : 34, tag: 'Character edit (typo-squat)', label: `"${v}" with ${rel.dist} character edit${rel.dist > 1 ? 's' : ''} (typo-squatting pattern)` };
+    }
+  }
+  function describeAdded(rel, ex, v) {
+    const under = ({ swap: 'with swapped letters', typo: 'with a typo', homoglyph: 'with look-alike characters' })[rel.kind] || '';
+    const words = ex.words.slice(0, 3).join(', ');
+    if (ex.cls === 'risky') return { pts: 38 + (under ? 6 : 0), tag: 'Added words', label: `Brand name ${under ? under + ' ' : ''}plus trust/support wording (${words})` };
+    if (ex.cls === 'neutral') return { pts: 12, tag: 'Brand mention (low risk)', label: `Brand name plus community-style wording (${words}) – usually a legitimate fan/news page` };
+    return { pts: 20 + (under ? 6 : 0), tag: 'Added words', label: `Brand name ${under ? under + ' ' : ''}inside a longer name – relationship to the brand unverified` };
+  }
+  function variantsOf(brand) {
+    const seen = new Set(), out = [];
+    const add = (v, min) => { if (!v) return; const k = sk(v); if (k.length < min || seen.has(k)) return; seen.add(k); out.push(v); };
+    add(brand.name, 3); (brand.aliases || []).forEach(v => add(v, 4)); (brand.identifiers || []).forEach(v => add(v, 5));
+    return out;
+  }
+  function nameSignal(variants, cand) {
+    if (!cand) return null;
+    let best = null; const take = s => { if (s && (!best || s.pts > best.pts)) best = s; };
+    const t = toks(cand);
+    for (const v of variants) {
+      const whole = relate(v, cand);
+      if (whole) { take(describeWhole(whole, v)); continue; }
+      for (let i = 0; i < t.length; i++) for (let j = i + 1; j <= Math.min(t.length, i + 4); j++) {
+        const rel = relate(v, t.slice(i, j).join(''));
+        if (!rel) continue;
+        const ex = classifyExtras([...t.slice(0, i), ...t.slice(j)].join(' '));
+        if (ex) take(describeAdded(rel.kind === 'spacing' ? { kind: 'exact' } : rel, ex, v));
+      }
+      const vk = sk(v);
+      if (vk.length >= 5) for (const c of skAll(cand)) {
+        const idx = c.indexOf(vk);
+        if (idx >= 0 && c !== vk) { const ex = classifyExtras(c.slice(0, idx) + ' ' + c.slice(idx + vk.length)); if (ex) take(describeAdded({ kind: 'exact' }, ex, v)); }
+      }
+    }
+    return best;
+  }
+
+  const normHandle = v => {
+    let s = String(v || '').trim().toLowerCase();
+    if (/^https?:\/\//.test(s)) { try { const u = new URL(s); const p = u.pathname.split('/').filter(Boolean); s = (['company', 'in', 'pages', 'school'].includes(p[0])) ? (p[1] || '') : (p[0] || ''); } catch (_) {} }
+    return s.replace(/^@/, '').replace(/\/$/, '');
+  };
+  const normDomain = s => {
+    s = String(s || '').trim().toLowerCase(); if (!s) return '';
+    try { const u = new URL(/^[a-z]+:\/\//.test(s) ? s : 'https://' + s); const h = u.hostname.replace(/^www\./, ''); return /^([a-z0-9-]+\.)+[a-z0-9-]{2,}$/.test(h) ? h : ''; } catch (_) { return ''; }
+  };
+  const hostOf = u => { try { const x = new URL(/^[a-z]+:\/\//i.test(u) ? u : 'https://' + u); return { host: x.hostname.toLowerCase().replace(/^www\./, ''), proto: x.protocol }; } catch (_) { return null; } };
+  const sldOf = host => { const p = host.split('.'); return p.length >= 2 ? p[p.length - 2] : p[0]; };
+  const SHORT = ['bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'is.gd', 'cutt.ly', 'rb.gy', 'shorturl.at', 'ow.ly'];
+  const BADTLD = ['xyz', 'top', 'click', 'live', 'icu', 'shop', 'buzz', 'gq', 'tk', 'ml', 'cf', 'work', 'support', 'rest', 'cyou', 'sbs', 'cam', 'monster'];
+
+  function linkSignals(brand, link) {
+    const out = { hits: [], others: [] };
+    if (!link) return out;
+    const h = hostOf(link); if (!h) return out;
+    const off = brand.domains || [];
+    if (off.some(d => h.host === d || h.host.endsWith('.' + d))) { out.others.push({ tag: 'Official link', label: `Links to an official domain (${h.host})`, pts: -10 }); return out; }
+    if (SHORT.includes(h.host)) out.others.push({ tag: 'Risky link', label: 'URL shortener hides the real destination', pts: 10 });
+    if (h.host.includes('xn--')) out.others.push({ tag: 'Risky link', label: 'Punycode (internationalised) domain – inspect for look-alike characters', pts: 15 });
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(h.host)) out.others.push({ tag: 'Risky link', label: 'Link points to a raw IP address', pts: 10 });
+    if (BADTLD.includes(h.host.split('.').pop())) out.others.push({ tag: 'Risky link', label: `Uses a TLD often abused for scams (.${h.host.split('.').pop()})`, pts: 8 });
+    if (h.proto === 'http:') out.others.push({ tag: 'Risky link', label: 'Link is not encrypted (HTTP)', pts: 5 });
+    const targets = [...new Set([...variantsOf(brand).map(sk), ...off.map(d => sk(sldOf(d)))])].filter(t => t.length >= 4);
+    const labels = h.host.split('.').slice(0, -1).map(sk).filter(Boolean);
+    if (labels.length > 1) labels.push(labels.join(''));
+    outer: for (const t of targets) for (const l of labels) {
+      if (l === t) { out.hits.push({ tag: 'Brand in foreign domain', label: `Brand name used on a non-official domain (${h.host})`, pts: 25 }); break outer; }
+      if (t.length >= 5 && l.includes(t)) { out.hits.push({ tag: 'Brand in foreign domain', label: `Brand name embedded in a non-official domain (${h.host})`, pts: 25 }); break outer; }
+      const f = fuzzy(t, l);
+      if (f) { out.hits.push({ tag: 'Look-alike domain', label: `Domain ${h.host} is a ${f.kind === 'swap' ? 'character-swap' : 'typo'} variant of the official domain/brand`, pts: 30 }); break outer; }
+    }
+    return out;
+  }
+
+  const hamming = (a, b) => { if (!a || !b || a.length !== b.length) return null; let d = 0; for (let i = 0; i < a.length; i++) { let x = parseInt(a[i], 16) ^ parseInt(b[i], 16); while (x) { d += x & 1; x >>= 1; } } return d; };
+
+  const STOP = new Set('the and for you your our are with from this that get new app official all can more not has have was were will its into out any one their about'.split(' '));
+  const bag = s => { const m = {}; nb(s).split(/[^a-z0-9]+/).filter(w => w.length > 2 && !STOP.has(w)).forEach(w => m[w] = (m[w] || 0) + 1); return m; };
+  function cosine(a, b) {
+    const ka = Object.keys(a), kb = Object.keys(b); if (!ka.length || !kb.length) return 0;
+    let dot = 0, na = 0, nbb = 0; ka.forEach(k => { na += a[k] * a[k]; if (b[k]) dot += a[k] * b[k]; }); kb.forEach(k => { nbb += b[k] * b[k]; });
+    return dot / (Math.sqrt(na) * Math.sqrt(nbb));
+  }
+  const SCAM = [[/(send|share|give|enter).{0,25}(otp|pin|password|cvv)/, 'asks for OTP / PIN / password'], [/claim.{0,18}(prize|reward|refund|bonus|cashback)/, 'prize or refund claim'], [/giveaway/, 'giveaway bait'], [/(double|triple) your/, '"double your…" promise'], [/guaranteed (profit|return|income)/, 'guaranteed returns'], [/verify your (account|identity|card)/, 'asks to verify account'], [/\bkyc\b/, 'KYC request'], [/limited[- ]time/, 'limited-time pressure'], [/\bdm (us|me)\b|message us (privately|directly)/, 'asks for private messages'], [/(registration|processing|joining|application) fee/, 'upfront fee'], [/whatsapp|telegram/, 'moves chat to WhatsApp/Telegram'], [/enter.{0,20}(card|bank) details/, 'asks for card/bank details'], [/(crypto|forex|bitcoin).{0,30}(invest|profit|trading)/, 'investment bait']];
+  const RISKYPERM = ['READ_SMS', 'RECEIVE_SMS', 'SEND_SMS', 'ACCESSIBILITY', 'SYSTEM_ALERT_WINDOW', 'READ_CONTACTS', 'REQUEST_INSTALL_PACKAGES', 'DEVICE_ADMIN', 'READ_CALL_LOG'];
+
+  const recKey = r => r.type === 'social' ? `social|${r.platform}|${normHandle(r.handle || r.url || r.name)}` : `app|${r.platform}|${String(r.packageId || r.name).toLowerCase()}`;
+  const officialPublishers = b => [...new Set((b.apps || []).map(a => a.publisher).filter(Boolean))];
+  function isOfficialSocial(b, r) { const h = normHandle(r.handle || r.url); return !!h && (b.social || []).some(o => o.platform === r.platform && normHandle(o.handle) === h); }
+  function isOfficialApp(b, r) {
+    const pkg = String(r.packageId || '').toLowerCase();
+    if (pkg && (b.apps || []).some(a => String(a.packageId || '').toLowerCase() === pkg)) return true;
+    return !!r.publisher && officialPublishers(b).some(p => raw(p) === raw(r.publisher));
+  }
+  function publisherSignal(b, pub) {
+    if (!pub) return null;
+    const offs = officialPublishers(b); if (!offs.length) offs.push(b.name);
+    for (const o of offs) {
+      for (const a of skAll(o)) for (const c of skAll(pub)) { if (a && a === c) return { pts: 25, tag: 'Look-alike publisher', label: `Publisher "${pub}" imitates the official publisher "${o}"` }; if (a.length >= 6 && dl(a, c) <= 2) return { pts: 25, tag: 'Look-alike publisher', label: `Publisher "${pub}" is a near-copy of the official publisher "${o}"` }; }
+    }
+    return { pts: 20, tag: 'Different publisher', label: `Publisher "${pub}" is not an official publisher for this brand` };
+  }
+  function pkgLooksLikeBrand(b, pkg) {
+    if (!pkg) return false; const p = String(pkg).toLowerCase();
+    const prefixes = (b.apps || []).map(a => String(a.packageId || '').toLowerCase().split('.').slice(0, 2).join('.')).filter(Boolean);
+    if (prefixes.some(x => p === x || p.startsWith(x + '.'))) return false;
+    const ps = sk(p); return variantsOf(b).some(v => { const k = sk(v); return k.length >= 5 && ps.includes(k); });
+  }
+
+  function evaluate(brand, rec, ctx) {
+    ctx = ctx || {}; const th = ctx.th || TH.balanced; const key = recKey(rec);
+    const base = { key, signals: [], techniques: [], score: 0 };
+    if (rec.type === 'social' ? isOfficialSocial(brand, rec) : isOfficialApp(brand, rec)) return { ...base, status: 'official', reason: 'Matches an official asset in the brand profile' };
+    if (ctx.allow && ctx.allow.includes(key)) return { ...base, status: 'cleared', reason: 'Allow-listed: previously marked as a false positive' };
+    const V = variantsOf(brand); const gate = [], boost = [];
+    const a = nameSignal(V, rec.name), b = rec.type === 'social' ? nameSignal(V, rec.handle || '') : null;
+    let nm = (a && b) ? (a.pts >= b.pts ? a : b) : (a || b);
+    if (nm) { nm = { ...nm }; if (a && b && a.pts >= 30 && b.pts >= 30) { nm.pts += 4; nm.label += ' (display name and handle both imitate the brand)'; } gate.push(nm); }
+    const d = hamming(brand.logoHash, rec.logoHash);
+    if (d !== null) { if (d <= 8) gate.push({ tag: 'Logo match', label: `Image is nearly identical to the official logo (fingerprint distance ${d}/64)`, pts: 28 }); else if (d <= 14) gate.push({ tag: 'Logo match', label: `Image is visually similar to the official logo (fingerprint distance ${d}/64)`, pts: 18 }); }
+    const lk = linkSignals(brand, rec.link); gate.push(...lk.hits); boost.push(...lk.others);
+    const text = rec.type === 'social' ? rec.bio : rec.description;
+    if (brand.description && text) { const sim = cosine(bag(brand.description), bag(text)); if (sim >= 0.5) gate.push({ tag: 'Copied description', label: `Text closely copies the official description (similarity ${Math.round(sim * 100)}%)`, pts: 15 }); else if (sim >= 0.3) boost.push({ tag: 'Copied description', label: `Text partly reuses the official description (similarity ${Math.round(sim * 100)}%)`, pts: 8 }); }
+    if (rec.type === 'app' && pkgLooksLikeBrand(brand, rec.packageId)) gate.push({ tag: 'Brand-like package ID', label: `Package ID "${rec.packageId}" contains the brand name but does not belong to the official publisher`, pts: 15 });
+    if (!gate.length) return { ...base, status: 'cleared', reason: 'No brand-related similarity found (name, logo, link, description, package)' };
+    const sc = SCAM.filter(([re]) => re.test(nb(text))).map(x => x[1]);
+    if (sc.length) boost.push({ tag: 'Scam language', label: `Scam-style wording: ${sc.slice(0, 3).join('; ')}`, pts: Math.min(20, 8 * sc.length) });
+    if (rec.type === 'social') {
+      if (rec.verified) boost.push({ tag: 'Verified badge', label: 'Platform-verified account (lowers risk)', pts: -15 });
+      if (rec.ageDays != null && rec.ageDays < 90) boost.push({ tag: 'New account', label: `Account created ${rec.ageDays} days ago`, pts: 8 });
+    } else {
+      const ps = publisherSignal(brand, rec.publisher); if (ps) boost.push(ps);
+      const perms = (rec.permissions || []).filter(p => RISKYPERM.some(r => String(p).toUpperCase().includes(r)));
+      if (perms.length) boost.push({ tag: 'Risky permissions', label: `Requests sensitive permissions: ${perms.slice(0, 3).join(', ')}`, pts: perms.length >= 2 ? 14 : 10 });
+      if (rec.ageDays != null && rec.ageDays < 60) boost.push({ tag: 'New app', label: `Published ${rec.ageDays} days ago`, pts: 6 });
+      if (rec.downloads != null && rec.downloads < 1000) boost.push({ tag: 'Low installs', label: `Only ${rec.downloads} downloads`, pts: 5 });
+    }
+    const signals = [...gate, ...boost].sort((x, y) => y.pts - x.pts);
+    const score = Math.max(0, Math.min(100, signals.reduce((s, x) => s + x.pts, 0)));
+    const techniques = [...new Set(signals.filter(s => s.pts > 0).map(s => s.tag))];
+    const reason = signals.filter(s => s.pts > 0).slice(0, 3).map(s => s.label).join(' · ');
+    if (score >= th.low) return { key, signals, techniques, score, status: 'flagged', reason };
+    return { key, signals, techniques, score, status: 'cleared', reason: `Low similarity (score ${score}, below the ${th.low} threshold)` };
+  }
+
+  // ---------- simulated feed + variant generation ----------
+  const mulberry32 = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const hashStr = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  function swapAdjacent(s, rng) {
+    const idx = []; for (let i = 1; i < s.length - 1; i++) if (/[a-z0-9]/i.test(s[i]) && /[a-z0-9]/i.test(s[i + 1]) && s[i].toLowerCase() !== s[i + 1].toLowerCase()) idx.push(i);
+    if (!idx.length) return s + 'x'; const i = idx[Math.floor(rng() * idx.length)];
+    return s.slice(0, i) + s[i + 1] + s[i] + s.slice(i + 2);
+  }
+  function homoglyphize(s) {
+    for (const [f, t] of [['o', '0'], ['l', '1'], ['e', '3'], ['i', '1'], ['s', '5'], ['a', '4']]) { const i = s.toLowerCase().indexOf(f); if (i >= 0) return s.slice(0, i) + t + s.slice(i + 1); }
+    return s + s[s.length - 1];
+  }
+  function flipHash(hex, k, rng) {
+    const bits = hex.split('').map(c => parseInt(c, 16).toString(2).padStart(4, '0')).join('').split('');
+    const used = new Set(); while (used.size < k) used.add(Math.floor(rng() * 64));
+    used.forEach(i => bits[i] = bits[i] === '1' ? '0' : '1');
+    let out = ''; for (let i = 0; i < 64; i += 4) out += parseInt(bits.slice(i, i + 4).join(''), 2).toString(16); return out;
+  }
+  const randHash = rng => { let s = ''; for (let i = 0; i < 16; i++) s += Math.floor(rng() * 16).toString(16); return s; };
+  const platUrl = (p, h) => ({ x: 'https://x.com/', instagram: 'https://instagram.com/', facebook: 'https://facebook.com/', linkedin: 'https://linkedin.com/company/' })[p] + h;
+
+  function buildFeed(brand) {
+    const rng = mulberry32(hashStr(brand.name)); const N = brand.name; let H = raw(N).replace(/[^a-z0-9]/g, '') || 'brand';
+    const first = N.split(/\s+/)[0]; const dom = (brand.domains && brand.domains[0]) || (H + '.com'); const sld = sldOf(dom);
+    const lh = brand.logoHash; const near = k => lh ? flipHash(lh, k, rng) : undefined;
+    const pubOff = officialPublishers(brand)[0] || (N + ' Technologies Pvt Ltd');
+    const id = (p) => `${brand.id || 'b'}-${p}`; const out = [];
+    const soc = (platform, o) => out.push({ type: 'social', platform, id: id(`${platform}-${out.length}`), verified: false, ...o });
+    const app = (platform, o) => out.push({ type: 'app', platform, id: id(`${platform}-${out.length}`), ...o });
+    // official records (must be excluded)
+    (brand.social || []).forEach(o => soc(o.platform, { name: N, handle: o.handle, url: platUrl(o.platform, o.handle), link: 'https://' + dom, bio: brand.description || `Official ${N} account`, verified: true, ageDays: 2600, followers: 184000, logoHash: lh }));
+    (brand.apps || []).forEach(o => app(o.store, { name: o.name, publisher: o.publisher, packageId: o.packageId, description: brand.description || `Official ${N} app`, permissions: [], ageDays: 1800, downloads: 5000000, link: 'https://' + dom, logoHash: lh }));
+    // impersonators
+    const sw = swapAdjacent(H, rng);
+    if (sk(N).length >= 6) {
+      soc('instagram', { name: N, handle: sw, url: platUrl('instagram', sw), link: 'https://bit.ly/' + Math.floor(rng() * 1e6).toString(36), bio: 'Official support • DM to claim your refund & rewards', ageDays: 21, followers: 1840, logoHash: near(3) });
+      soc('facebook', { name: homoglyphize(N), handle: homoglyphize(H), url: platUrl('facebook', homoglyphize(H)), link: `https://${swapAdjacent(sld, rng)}.${dom.split('.').slice(1).join('.') || 'com'}/login`, bio: `Welcome to ${N}. Customer care and offers.`, ageDays: 12, followers: 905, logoHash: near(2) });
+    } else {
+      soc('instagram', { name: N, handle: H + '.official', url: platUrl('instagram', H + '.official'), link: 'https://bit.ly/' + Math.floor(rng() * 1e6).toString(36), bio: 'Official support • DM to claim your refund & rewards', ageDays: 21, followers: 1840, logoHash: near(3) });
+      soc('facebook', { name: homoglyphize(N), handle: homoglyphize(H), url: platUrl('facebook', homoglyphize(H)), link: `https://${H}-login.top/`, bio: `Welcome to ${N}.`, ageDays: 12, followers: 905, logoHash: near(2) });
+    }
+    soc('x', { name: `${N} Customer Support`, handle: `${H}_support_help`, url: platUrl('x', `${H}_support_help`), link: `https://${H}-help.top/login`, bio: 'Having trouble? DM us your account details and we will verify your account.', ageDays: 40, followers: 312, logoHash: near(5) });
+    const mid = Math.ceil(H.length / 2);
+    soc('facebook', { name: `${N} Official`, handle: `${H.slice(0, mid)}.${H.slice(mid)}`, url: platUrl('facebook', `${H.slice(0, mid)}.${H.slice(mid)}`), link: '', bio: `Latest updates and offers from ${N}.`, ageDays: 55, followers: 2300, logoHash: randHash(rng) });
+    soc('linkedin', { name: `${N} Careers & Hiring Desk`, handle: `${H}-hr-recruitment`, url: platUrl('linkedin', `${H}-hr-recruitment`), link: `https://${H}-jobs.click/apply`, bio: 'We are hiring! Registration fee applies. Contact us on WhatsApp.', ageDays: 30, followers: 140, logoHash: randHash(rng) });
+    // benign / ambiguous
+    soc('x', { name: `${N} Fans Community`, handle: `${H}fans`, url: platUrl('x', `${H}fans`), link: '', bio: 'Unofficial fan community. Memes and news.', ageDays: 900, followers: 5200, logoHash: randHash(rng) });
+    soc('facebook', { name: `${first} Plumbing & Heating`, handle: `${raw(first)}plumbing`, url: platUrl('facebook', `${raw(first)}plumbing`), link: '', bio: 'Family-run plumbers since 1998.', ageDays: 1200, followers: 640, logoHash: randHash(rng) });
+    soc('instagram', { name: 'Green Valley Bakery', handle: 'greenvalleybakery', url: platUrl('instagram', 'greenvalleybakery'), link: '', bio: 'Fresh bread daily.', ageDays: 700, followers: 3100, logoHash: randHash(rng) });
+    soc('x', { name: 'Sunrise Yoga Studio', handle: 'sunriseyoga', url: platUrl('x', 'sunriseyoga'), link: '', bio: 'Morning classes.', ageDays: 800, followers: 900, logoHash: randHash(rng) });
+    soc('linkedin', { name: 'Maple Street Consulting', handle: 'maple-street-consulting', url: platUrl('linkedin', 'maple-street-consulting'), link: '', bio: 'Boutique advisory.', ageDays: 1500, followers: 410, logoHash: randHash(rng) });
+    // apps
+    const nSw = swapAdjacent(N, rng);
+    app('googleplay', { name: `${N} Wallet Plus`, publisher: 'Zenith Mobile Apps Ltd', packageId: `com.zenithapps.${H}wallet`, description: `Manage your ${N} account, pay bills and earn free rewards. Enter your card details to unlock bonus.`, permissions: ['READ_SMS', 'BIND_ACCESSIBILITY_SERVICE', 'SYSTEM_ALERT_WINDOW'], ageDays: 18, downloads: 800, link: `https://${H}-wallet.xyz`, logoHash: near(4) });
+    app('googleplay', { name: nSw, publisher: 'Appify Studio', packageId: `com.appify.${raw(nSw)}`, description: `Official ${N} app for fast access to your account.`, permissions: [], ageDays: 70, downloads: 2400, link: '', logoHash: randHash(rng) });
+    app('appstore', { name: N, publisher: pubOff.replace(/a/i, '\u0430'), packageId: `com.${H}mobile.app`, description: brand.description ? brand.description.split(/[.,]/)[0] + '.' : `Fast, secure payments and rewards from ${N}.`, permissions: [], ageDays: 40, downloads: 3200, link: `https://${dom}`, logoHash: near(6) });
+    app('googleplay', { name: `${N} Keyboard Themes`, publisher: 'Themify Studio', packageId: 'com.themify.keyboard', description: 'Beautiful keyboard themes and wallpapers.', permissions: [], ageDays: 400, downloads: 120000, link: '', logoHash: randHash(rng) });
+    app('googleplay', { name: 'Daily Sudoku Puzzles', publisher: 'Zen Games', packageId: 'com.zengames.sudoku', description: 'Classic number puzzles.', permissions: [], ageDays: 900, downloads: 800000, link: '', logoHash: randHash(rng) });
+    app('appstore', { name: 'QuickPic Photo Editor', publisher: 'Pixel Works', packageId: 'com.pixelworks.quickpic', description: 'Edit photos fast.', permissions: [], ageDays: 600, downloads: 250000, link: '', logoHash: randHash(rng) });
+    return out;
+  }
+
+  function generateVariants(brand) {
+    const rng = mulberry32(hashStr(brand.name)); const H = raw(brand.name).replace(/[^a-z0-9]/g, ''); const dom = (brand.domains && brand.domains[0]) || H + '.com'; const sld = sldOf(dom); const k = Math.ceil(H.length / 2);
+    const v = [];
+    if (sk(H).length >= 5) v.push({ label: 'Character swap', example: swapAdjacent(H, rng) });
+    v.push({ label: 'Homoglyph', example: homoglyphize(H) });
+    v.push({ label: 'Spacing / separators', example: `${H.slice(0, k)}_${H.slice(k)}` });
+    v.push({ label: 'Added words', example: `${H}_support` });
+    v.push({ label: 'Added words', example: `official.${H}` });
+    if (sk(H).length >= 6) v.push({ label: 'Typo (missing letter)', example: H.slice(0, k) + H.slice(k + 1) });
+    v.push({ label: 'Look-alike domain', example: `${swapAdjacent(sld, rng)}.${dom.split('.').slice(1).join('.') || 'com'}` });
+    v.push({ label: 'Brand in foreign domain', example: `${sld}-login.top` });
+    return v;
+  }
+
+  const DEMO_BRAND = {
+    name: 'NovaPay', aliases: ['Nova Pay', 'Nova'], identifiers: ['NovaCard', 'NovaRewards'], domains: ['novapay.com'],
+    description: 'NovaPay is a digital wallet for fast, secure payments, bill pay and rewards.',
+    social: [{ platform: 'x', handle: 'novapay' }, { platform: 'instagram', handle: 'novapay' }, { platform: 'facebook', handle: 'novapay' }, { platform: 'linkedin', handle: 'novapay' }],
+    apps: [{ store: 'googleplay', name: 'NovaPay – Digital Wallet', publisher: 'NovaPay Technologies Pvt Ltd', packageId: 'com.novapay.wallet' }, { store: 'appstore', name: 'NovaPay', publisher: 'NovaPay Technologies Pvt Ltd', packageId: 'com.novapay.ios' }]
+  };
+
+  return { SOURCES, TH, PLAT, platId, platLabel, levelOf, evaluate, buildFeed, generateVariants, normHandle, normDomain, hamming, recKey, DEMO_BRAND, sk, nameSignal, relate, variantsOf, hostOf };
+})();
+</script>
+
+<!-- ================= APPLICATION ================= -->
+<script>
+(() => {
+  const { SOURCES, TH, evaluate, buildFeed, generateVariants, normHandle, normDomain, platId, platLabel, levelOf, recKey, DEMO_BRAND, variantsOf } = RS;
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const STATUSES = ['Needs Verification', 'Under Review', 'Confirmed Impersonation', 'Reported / Taken Down', 'False Positive'];
+  const KEY = 'riskshield-v2';
+
+  // ---------- store ----------
+  const defaults = () => ({ brands: [], activeBrandId: '', findings: [], activity: [], allow: [], imported: [], sensitivity: 'balanced', sources: {}, lastScan: { social: null, app: null } });
+  function readStore() {
+    const d = defaults();
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      ['brands', 'findings', 'activity', 'allow', 'imported'].forEach(k => { if (Array.isArray(s[k])) d[k] = s[k]; });
+      if (typeof s.activeBrandId === 'string') d.activeBrandId = s.activeBrandId;
+      if (TH[s.sensitivity]) d.sensitivity = s.sensitivity;
+      if (s.sources && typeof s.sources === 'object') d.sources = s.sources;
+      if (s.lastScan && typeof s.lastScan === 'object') d.lastScan = { social: s.lastScan.social || null, app: s.lastScan.app || null };
+    } catch (_) {}
+    SOURCES.forEach(src => { d.sources[src.id] = { enabled: true, simulateDown: false, ...(d.sources[src.id] || {}) }; });
+    return d;
+  }
+  let store = readStore();
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (_) { toast('Could not save in this browser (storage full or blocked).', 'error'); } };
+  const ctx = () => ({ th: TH[store.sensitivity], allow: store.allow });
+  const activeBrand = () => store.brands.find(b => b.id === store.activeBrandId) || null;
+  const brandFindings = (bid, ch) => store.findings.filter(f => f.brandId === bid && (!ch || f.channel === ch));
+  const levelFor = score => levelOf(score, TH[store.sensitivity]);
+
+  function toast(msg, kind) {
+    const t = $('toast'); t.textContent = msg;
+    t.className = 'fixed bottom-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm ' + (kind === 'error' ? 'bg-red-600' : 'bg-slate-800');
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add('hidden'), 3800);
+  }
+  function addActivity(message, type, result) {
+    store.activity.unshift({ message, type: type || 'System', result: result || 'Success', date: new Date().toISOString() });
+    store.activity = store.activity.slice(0, 300);
+  }
+  const ago = iso => { const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+
+  // ---------- navigation ----------
+  function switchTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+    const el = $('tab-' + name); if (el) el.classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('tab-active', b.dataset.tab === name));
+    $('mobile-menu').classList.remove('active'); window.scrollTo(0, 0);
+    if (name === 'arch') renderArch();
+  }
+  $('menu-toggle').addEventListener('click', () => $('mobile-menu').classList.toggle('active'));
+
+  // ---------- brand form ----------
+  let editingId = null, logoData = '', logoHash = '';
+  const socialRow = (d = {}) => `<div class="social-row grid grid-cols-12 gap-2"><select class="sr-platform col-span-4 md:col-span-3 px-2 py-2 border rounded-lg text-sm">${['x', 'instagram', 'facebook', 'linkedin'].map(p => `<option value="${p}" ${d.platform === p ? 'selected' : ''}>${esc(platLabel(p))}</option>`).join('')}</select><input class="sr-handle col-span-7 md:col-span-8 px-3 py-2 border rounded-lg text-sm" placeholder="@handle or profile URL" value="${esc(d.handle || '')}"><button data-action="rm-row" class="col-span-1 text-gray-400 hover:text-red-600" aria-label="Remove">&times;</button></div>`;
+  const appRow = (d = {}) => `<div class="app-row grid grid-cols-1 md:grid-cols-12 gap-2"><select class="ar-store md:col-span-2 px-2 py-2 border rounded-lg text-sm"><option value="googleplay" ${d.store === 'googleplay' ? 'selected' : ''}>Google Play</option><option value="appstore" ${d.store === 'appstore' ? 'selected' : ''}>App Store</option></select><input class="ar-name md:col-span-3 px-3 py-2 border rounded-lg text-sm" placeholder="App name" value="${esc(d.name || '')}"><input class="ar-pub md:col-span-3 px-3 py-2 border rounded-lg text-sm" placeholder="Publisher / developer" value="${esc(d.publisher || '')}"><input class="ar-pkg md:col-span-3 px-3 py-2 border rounded-lg text-sm" placeholder="com.company.app" value="${esc(d.packageId || '')}"><button data-action="rm-row" class="md:col-span-1 text-gray-400 hover:text-red-600 text-left md:text-center" aria-label="Remove">&times;</button></div>`;
+  const addSocialRow = d => $('b-social-rows').insertAdjacentHTML('beforeend', socialRow(d));
+  const addAppRow = d => $('b-app-rows').insertAdjacentHTML('beforeend', appRow(d));
+
+  function fillForm(b) {
+    $('b-name').value = b.name || ''; $('b-domains').value = (b.domains || []).join(', '); $('b-aliases').value = (b.aliases || []).join(', ');
+    $('b-identifiers').value = (b.identifiers || []).join(', '); $('b-desc').value = b.description || ''; $('b-logo-url').value = b.logoUrl || '';
+    $('b-logo-file').value = ''; logoData = b.logoUpload || ''; logoHash = b.logoHash || '';
+    showLogoPreview(logoData || b.logoUrl, logoHash);
+    $('b-social-rows').innerHTML = ''; $('b-app-rows').innerHTML = '';
+    (b.social && b.social.length ? b.social : [{ platform: 'x', handle: '' }]).forEach(addSocialRow);
+    (b.apps && b.apps.length ? b.apps : [{ store: 'googleplay' }]).forEach(addAppRow);
+    $('b-errors').classList.add('hidden'); $('b-warnings').classList.add('hidden');
+  }
+  function showLogoPreview(src, hash) {
+    if (!src) { $('b-logo-preview-wrap').classList.add('hidden'); return; }
+    $('b-logo-preview').src = src; $('b-logo-hash').textContent = hash ? 'Logo fingerprint: ' + hash : 'No fingerprint yet'; $('b-logo-preview-wrap').classList.remove('hidden');
+  }
+  function clearForm() { editingId = null; fillForm({}); }
+  function readForm() {
+    const v = id => $(id).value.trim(); const split = s => s.split(/[,\n;]+/).map(x => x.trim()).filter(Boolean);
+    return {
+      name: v('b-name'), aliases: split(v('b-aliases')), identifiers: split(v('b-identifiers')), domains: split(v('b-domains')), description: v('b-desc'), logoUrl: v('b-logo-url'),
+      social: [...document.querySelectorAll('#b-social-rows .social-row')].map(r => ({ platform: r.querySelector('.sr-platform').value, handle: r.querySelector('.sr-handle').value.trim() })).filter(r => r.handle),
+      apps: [...document.querySelectorAll('#b-app-rows .app-row')].map(r => ({ store: r.querySelector('.ar-store').value, name: r.querySelector('.ar-name').value.trim(), publisher: r.querySelector('.ar-pub').value.trim(), packageId: r.querySelector('.ar-pkg').value.trim() })).filter(a => a.name || a.publisher || a.packageId)
+    };
+  }
+  function validateBrand(d) {
+    const errors = [], warnings = []; const clean = { ...d };
+    if (d.name.length < 2 || d.name.length > 60) errors.push('Brand name must be 2–60 characters.');
+    else if (store.brands.some(b => b.id !== editingId && RS.sk(b.name) === RS.sk(d.name))) errors.push('A brand profile with this name already exists.');
+    const doms = []; if (!d.domains.length) errors.push('Add at least one official website domain.');
+    d.domains.forEach(x => { const n = normDomain(x); if (!n) errors.push(`"${x}" is not a valid domain (example: novapay.com).`); else if (!doms.includes(n)) doms.push(n); });
+    clean.domains = doms;
+    if (d.logoUrl) { try { if (!/^https?:$/.test(new URL(d.logoUrl).protocol)) throw 0; } catch (_) { errors.push('Logo URL must start with http:// or https://.'); } }
+    const seen = new Set(); clean.social = [];
+    d.social.forEach(s => { const h = normHandle(s.handle); if (!/^[a-z0-9._-]{2,60}$/.test(h)) { errors.push(`"${s.handle}" is not a valid ${platLabel(s.platform)} handle.`); return; } const k = s.platform + '|' + h; if (seen.has(k)) { errors.push(`Duplicate ${platLabel(s.platform)} account "${h}".`); return; } seen.add(k); clean.social.push({ platform: s.platform, handle: h }); });
+    clean.apps = [];
+    d.apps.forEach(a => {
+      if (!a.name || !a.publisher) { errors.push('Each official app needs both an app name and a publisher.'); return; }
+      if (a.packageId && !/^[a-z][a-z0-9_-]*(\.[a-z0-9_-]+)+$/i.test(a.packageId)) { errors.push(`"${a.packageId}" is not a valid package / bundle ID (example: com.company.app).`); return; }
+      if (!a.packageId) warnings.push(`"${a.name}" has no package / bundle ID – exclusion will rely on the publisher name only.`);
+      clean.apps.push({ ...a, packageId: a.packageId.toLowerCase() });
+    });
+    if (!clean.social.length) warnings.push('No official social accounts listed – your own accounts could be flagged.');
+    if (!clean.apps.length) warnings.push('No official apps listed – your own apps could be flagged.');
+    if (!d.logoUrl && !logoData) warnings.push('No logo provided – logo comparison will be skipped.');
+    if (!d.description) warnings.push('No description provided – copied-description detection will be skipped.');
+    return { errors, warnings, clean };
+  }
+  function hashImageSrc(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image(); if (!String(src).startsWith('data:')) img.crossOrigin = 'anonymous';
+      img.onload = () => { try { const c = document.createElement('canvas'); c.width = 9; c.height = 8; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 9, 8); x.drawImage(img, 0, 0, 9, 8); const d = x.getImageData(0, 0, 9, 8).data; const g = []; for (let i = 0; i < 72; i++) { const o = i * 4; g.push(0.299 * d[o] + 0.587 * d[o + 1] + 0.114 * d[o + 2]); } let bits = ''; for (let r = 0; r < 8; r++) for (let col = 0; col < 8; col++) bits += g[r * 9 + col] > g[r * 9 + col + 1] ? '1' : '0'; let hex = ''; for (let i = 0; i < 64; i += 4) hex += parseInt(bits.slice(i, i + 4), 2).toString(16); resolve(hex); } catch (e) { reject(e); } };
+      img.onerror = () => reject(new Error('Image could not be loaded')); img.src = src;
+    });
+  }
+  const readFileAsDataUrl = file => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
+  function checkImageFile(file) { if (!file.type.startsWith('image/')) return 'Please choose an image file.'; if (file.size > 1024 * 1024) return 'Image must be smaller than 1 MB.'; return ''; }
+
+  $('b-logo-file').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; if (!f) { logoData = ''; logoHash = ''; showLogoPreview(''); return; }
+    const err = checkImageFile(f); if (err) { toast(err, 'error'); e.target.value = ''; return; }
+    try { logoData = await readFileAsDataUrl(f); logoHash = await hashImageSrc(logoData); showLogoPreview(logoData, logoHash); } catch (_) { toast('Could not read that image. Try PNG or JPG.', 'error'); }
+  });
+
+  async function saveBrand(clean0) {
+    const raw0 = clean0 || readForm(); const { errors, warnings, clean } = validateBrand(raw0);
+    const eb = $('b-errors'), wb = $('b-warnings');
+    if (errors.length) { eb.innerHTML = '<strong>Please fix:</strong><ul class="list-disc pl-5 mt-1">' + errors.map(e => `<li>${esc(e)}</li>`).join('') + '</ul>'; eb.classList.remove('hidden'); wb.classList.add('hidden'); eb.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+    eb.classList.add('hidden');
+    const existing = store.brands.find(b => b.id === editingId);
+    let hash = logoHash, upload = logoData;
+    if (!upload && clean.logoUrl) {
+      if (existing && existing.logoUrl === clean.logoUrl && existing.logoHash) hash = existing.logoHash;
+      else { try { hash = await hashImageSrc(clean.logoUrl); } catch (_) { hash = ''; warnings.push('Could not fingerprint the logo URL (the host blocks browser access). Upload the logo file instead.'); } }
+    }
+    if (!upload && !clean.logoUrl) hash = '';
+    const brand = { ...(existing || {}), ...clean, id: existing ? existing.id : 'brand-' + Date.now(), logoUpload: upload, logoHash: hash, updatedAt: new Date().toISOString(), createdAt: existing ? existing.createdAt : new Date().toISOString() };
+    if (existing) Object.assign(existing, brand); else store.brands.push(brand);
+    store.activeBrandId = brand.id; editingId = brand.id;
+    addActivity(`Brand profile ${existing ? 'updated' : 'saved'}: ${brand.name} (${brand.social.length} social, ${brand.apps.length} app assets${hash ? ', logo fingerprinted' : ''})`, 'Brand');
+    persist(); renderAll(); showWarnings(warnings);
+    toast(`Brand profile "${brand.name}" saved. Run a social or app scan next.`); return true;
+  }
+  function showWarnings(w) { const wb = $('b-warnings'); if (!w.length) { wb.classList.add('hidden'); return; } wb.innerHTML = '<strong>Heads-up:</strong><ul class="list-disc pl-5 mt-1">' + [...new Set(w)].map(x => `<li>${esc(x)}</li>`).join('') + '</ul>'; wb.classList.remove('hidden'); }
+  function makeDemoLogo() {
+    const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 128, 128); g.addColorStop(0, '#2563eb'); g.addColorStop(1, '#7c3aed');
+    x.fillStyle = '#fff'; x.fillRect(0, 0, 128, 128); x.fillStyle = g; x.beginPath(); x.arc(64, 64, 56, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#fff'; x.font = 'bold 72px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('N', 64, 70); return c.toDataURL('image/png');
+  }
+  async function loadDemoBrand() {
+    editingId = (store.brands.find(b => RS.sk(b.name) === RS.sk(DEMO_BRAND.name)) || {}).id || null;
+    fillForm({ ...DEMO_BRAND, logoUrl: '' });
+    try { logoData = makeDemoLogo(); logoHash = await hashImageSrc(logoData); showLogoPreview(logoData, logoHash); } catch (_) { logoData = ''; logoHash = ''; }
+    const ok = await saveBrand(); if (ok) { switchTab('social'); toast('Demo brand NovaPay loaded. Click “Run social scan”.'); }
+  }
+
+  // ---------- scanning ----------
+  function upsertFinding(brand, rec, ev, source) {
+    const ex = store.findings.find(f => f.brandId === brand.id && f.key === ev.key);
+    const data = { channel: rec.type, platform: rec.platform, name: rec.name, handle: rec.handle || '', url: rec.url || '', packageId: rec.packageId || '', publisher: rec.publisher || '', score: ev.score, signals: ev.signals, techniques: ev.techniques, reason: ev.reason, source, rec: { link: rec.link || '', bio: rec.bio || '', description: rec.description || '', verified: !!rec.verified, ageDays: rec.ageDays, followers: rec.followers, downloads: rec.downloads, permissions: rec.permissions || [], logoHash: rec.logoHash || '' }, date: new Date().toISOString() };
+    if (ex) { Object.assign(ex, data); return ex; }
+    const f = { id: `f-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, brandId: brand.id, brandName: brand.name, key: ev.key, status: 'Needs Verification', firstSeen: new Date().toISOString(), ...data };
+    store.findings.unshift(f); return f;
+  }
+  async function runScan(channel, only) {
+    const brand = activeBrand();
+    if (!brand) { toast('Create or load a brand profile first.', 'error'); switchTab('brand'); return; }
+    const srcs = SOURCES.filter(s => s.type === channel && (!only || only.includes(s.id)));
+    const msg = $(channel + '-msg'), btn = $('run-' + channel);
+    btn.disabled = true; btn.classList.add('opacity-60'); msg.textContent = `Scanning ${srcs.length} source${srcs.length > 1 ? 's' : ''} for ${brand.name}…`;
+    if (!only) addActivity(`${channel === 'social' ? 'Social' : 'App store'} scan started for ${brand.name}`, 'Scan');
+    await new Promise(r => setTimeout(r, 450));
+    let ls = store.lastScan[channel]; if (!ls || ls.brandId !== brand.id || !only) ls = { brandId: brand.id, at: new Date().toISOString(), sources: {} };
+    ls.at = new Date().toISOString();
+    const feed = buildFeed(brand).concat(store.imported);
+    let flaggedTotal = 0, unavailable = 0;
+    srcs.forEach(s => {
+      const cfg = store.sources[s.id];
+      if (!cfg.enabled) { ls.sources[s.id] = { state: 'disabled', count: 0, official: [], cleared: [], at: ls.at }; return; }
+      if (cfg.simulateDown) { unavailable++; ls.sources[s.id] = { state: 'unavailable', count: 0, official: [], cleared: [], at: ls.at, msg: 'Connection timed out (simulated outage)' }; addActivity(`${s.label} unavailable – connection timed out (simulated). Scan continues with remaining sources.`, 'Source', 'Warning'); return; }
+      const recs = feed.filter(r => r.type === channel && r.platform === s.id); const official = [], cleared = []; let flagged = 0;
+      recs.forEach(rec => {
+        const ev = evaluate(brand, rec, ctx());
+        if (ev.status === 'official') official.push({ name: rec.name, handle: rec.handle || rec.packageId || '', platform: s.id });
+        else if (ev.status === 'flagged') { upsertFinding(brand, rec, ev, rec.id && String(rec.id).startsWith('imp-') ? 'imported' : 'simulated'); flagged++; }
+        else cleared.push({ name: rec.name, platform: s.id, score: ev.score, reason: ev.reason });
+      });
+      flaggedTotal += flagged;
+      ls.sources[s.id] = { state: 'ok', count: recs.length, official, cleared: cleared.slice(0, 60), at: ls.at, flagged };
+      addActivity(`${s.label}: ${recs.length} records analysed – ${flagged} flagged, ${official.length} official excluded, ${cleared.length} not flagged`, 'Source');
+    });
+    store.lastScan[channel] = ls;
+    addActivity(`${channel === 'social' ? 'Social' : 'App store'} scan ${unavailable ? 'completed with partial results' : 'completed'} for ${brand.name}: ${flaggedTotal} new/updated finding${flaggedTotal === 1 ? '' : 's'}`, 'Scan', unavailable ? 'Warning' : 'Success');
+    persist(); btn.disabled = false; btn.classList.remove('opacity-60'); renderAll();
+    msg.textContent = `Scan complete at ${new Date().toLocaleTimeString()}${unavailable ? ` – ${unavailable} source${unavailable > 1 ? 's' : ''} unavailable (partial results)` : ''}. Source: simulated feed + imported records, not live platform data.`;
+  }
+
+  async function manualCheck(channel) {
+    const brand = activeBrand(); if (!brand) { toast('Create or load a brand profile first.', 'error'); switchTab('brand'); return; }
+    const v = id => $(id).value.trim(); const num = id => { const x = v(id); return x === '' ? null : Math.max(0, Number(x)); };
+    let rec;
+    if (channel === 'social') {
+      if (!v('ms-name') || !v('ms-handle')) { toast('Enter a display name and a handle or profile URL.', 'error'); return; }
+      rec = { type: 'social', platform: $('ms-platform').value, name: v('ms-name'), handle: normHandle(v('ms-handle')), url: /^https?:/.test(v('ms-handle')) ? v('ms-handle') : '', link: v('ms-link'), bio: v('ms-bio'), verified: $('ms-verified').checked, ageDays: num('ms-age') };
+    } else {
+      if (!v('ma-name')) { toast('Enter the app name.', 'error'); return; }
+      rec = { type: 'app', platform: $('ma-store').value, name: v('ma-name'), publisher: v('ma-publisher'), packageId: v('ma-package').toLowerCase(), link: v('ma-link'), description: v('ma-desc'), permissions: v('ma-perms').split(',').map(x => x.trim()).filter(Boolean), ageDays: num('ma-age'), downloads: num('ma-downloads') };
+    }
+    const file = $(channel === 'social' ? 'ms-logo' : 'ma-logo').files[0];
+    if (file) { const err = checkImageFile(file); if (err) { toast(err, 'error'); return; } try { rec.logoHash = await hashImageSrc(await readFileAsDataUrl(file)); } catch (_) { toast('Image could not be fingerprinted; continuing without logo comparison.', 'error'); } }
+    const ev = evaluate(brand, rec, ctx());
+    if (ev.status === 'flagged') upsertFinding(brand, rec, ev, 'manual');
+    addActivity(`Manual ${channel} check: ${rec.name} → ${ev.status === 'flagged' ? 'flagged (' + ev.score + '/100)' : ev.status}`, 'Scan');
+    persist(); renderAll();
+    const box = $(channel === 'social' ? 'ms-result' : 'ma-result'); box.classList.remove('hidden');
+    const lvl = levelFor(ev.score), color = ev.status === 'flagged' ? (lvl === 'High' ? 'border-red-200 bg-red-50' : lvl === 'Medium' ? 'border-amber-200 bg-amber-50' : 'border-green-200 bg-green-50') : 'border-green-200 bg-green-50';
+    box.className = 'mt-4 rounded-lg border p-4 text-sm ' + color;
+    box.innerHTML = ev.status === 'official' ? `<strong>Official asset.</strong> ${esc(ev.reason)} – not flagged.` :
+      `<div class="font-bold text-base mb-1">${ev.status === 'flagged' ? `Flagged · ${lvl} risk · ${ev.score}/100` : `Not flagged · score ${ev.score}/100`}</div><p class="mb-2">${esc(ev.reason)}</p>` +
+      (ev.signals.length ? `<ul class="space-y-1">${ev.signals.map(s => `<li><span class="inline-block w-12 font-mono ${s.pts < 0 ? 'text-green-700' : 'text-gray-700'}">${s.pts > 0 ? '+' : ''}${s.pts}</span> <strong>${esc(s.tag)}:</strong> ${esc(s.label)}</li>`).join('')}</ul>` : '') +
+      `<p class="text-xs text-gray-500 mt-2">Heuristic triage score – verify before taking action.${ev.status === 'flagged' ? ' Saved to Reports.' : ''}</p>`;
+  }
+
+  // ---------- summaries ----------
+  function lastSummary(ch) {
+    const b = activeBrand(), ls = store.lastScan[ch]; if (!b || !ls || ls.brandId !== b.id) return null;
+    const list = SOURCES.filter(s => s.type === ch).map(s => ({ id: s.id, label: s.label, ...(ls.sources[s.id] || { state: 'idle', count: 0, official: [], cleared: [] }) }));
+    let scanned = 0, official = [], cleared = []; list.forEach(s => { if (s.state === 'ok') { scanned += s.count; official.push(...s.official); cleared.push(...s.cleared); } });
+    return { at: ls.at, sources: list, scanned, official, cleared };
+  }
+
+  // ---------- rendering ----------
+  const levelBadge = score => { const l = levelFor(score); return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${l === 'High' ? 'risk-high' : l === 'Medium' ? 'risk-medium' : 'risk-low'}">${l} · ${score}</span>`; };
+  const tagBadges = f => { const t = f.techniques || []; return t.slice(0, 4).map(x => `<span class="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded mr-1 mb-1">${esc(x)}</span>`).join('') + (t.length > 4 ? `<span class="text-xs text-gray-500">+${t.length - 4}</span>` : ''); };
+  const statusSelect = f => `<select data-change="status" data-id="${esc(f.id)}" class="border rounded p-1 text-xs">${STATUSES.map(s => `<option ${s === f.status ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>`;
+
+  function renderBrandSelector() {
+    const sel = $('active-brand');
+    sel.innerHTML = store.brands.length ? store.brands.map(b => `<option value="${esc(b.id)}" ${b.id === store.activeBrandId ? 'selected' : ''}>${esc(b.name)}</option>`).join('') : '<option value="">No brand yet</option>';
+    if (!activeBrand() && store.brands.length) store.activeBrandId = store.brands[0].id;
+    $('bar-hint').textContent = store.brands.length ? '' : 'Start with Brand Profile → Load demo brand.';
+  }
+  function renderBrandList() {
+    const el = $('brand-list');
+    el.innerHTML = store.brands.length ? store.brands.map(b => `<div class="flex items-center justify-between border rounded-lg p-2"><div><div class="font-medium">${esc(b.name)}${b.id === store.activeBrandId ? ' <span class="text-xs text-primary">(active)</span>' : ''}</div><div class="text-xs text-gray-500">${b.social.length} social · ${b.apps.length} apps · ${esc((b.domains || [])[0] || '')}</div></div><div class="space-x-2 text-xs"><button data-action="use-brand" data-id="${esc(b.id)}" class="text-primary">Use</button><button data-action="edit-brand" data-id="${esc(b.id)}" class="text-primary">Edit</button><button data-action="delete-brand" data-id="${esc(b.id)}" class="text-red-600">Delete</button></div></div>`).join('') : '<p class="text-gray-500">No brands saved yet.</p>';
+    const b = activeBrand();
+    const checks = b ? [['Name', !!b.name], ['Official domain', b.domains.length > 0], ['Logo fingerprint', !!b.logoHash], ['Description', !!b.description], ['Social accounts', b.social.length > 0], ['Mobile apps', b.apps.length > 0], ['Aliases / identifiers', (b.aliases || []).length + (b.identifiers || []).length > 0]] : [];
+    const pct = checks.length ? Math.round(checks.filter(c => c[1]).length / checks.length * 100) : 0;
+    $('completeness').innerHTML = b ? `<div class="w-full bg-gray-200 rounded-full h-2 mb-3"><div class="bar" style="width:${pct}%"></div></div><p class="mb-2 font-medium">${pct}% complete</p><ul class="space-y-1">${checks.map(c => `<li>${c[1] ? '<i class="fas fa-check-circle text-green-600"></i>' : '<i class="far fa-circle text-gray-400"></i>'} ${esc(c[0])}</li>`).join('')}</ul>` : '<p class="text-gray-500">Save a brand to see completeness.</p>';
+    $('variant-preview').innerHTML = b ? generateVariants(b).map(v => `<div class="flex items-center justify-between gap-2"><span class="text-gray-600">${esc(v.label)}</span><code class="bg-slate-100 px-2 py-0.5 rounded text-xs">${esc(v.example)}</code></div>`).join('') : '<p class="text-gray-500">Save a brand to preview.</p>';
+  }
+  function renderDashboard() {
+    const b = activeBrand(), fs = b ? brandFindings(b.id).filter(f => f.status !== 'False Positive') : [];
+    const soc = lastSummary('social'), app = lastSummary('app');
+    $('st-brands').textContent = store.brands.length; $('st-scanned').textContent = (soc ? soc.scanned : 0) + (app ? app.scanned : 0);
+    $('st-threats').textContent = fs.length; $('st-high').textContent = fs.filter(f => levelFor(f.score) === 'High').length;
+    $('st-official').textContent = (soc ? soc.official.length : 0) + (app ? app.official.length : 0);
+    const all = [...(soc ? soc.sources : []), ...(app ? app.sources : [])].filter(s => s.state !== 'idle' && s.state !== 'disabled');
+    $('st-sources').textContent = all.length ? `${all.filter(s => s.state === 'ok').length}/${all.length}` : '–';
+    $('lv-high').textContent = fs.filter(f => levelFor(f.score) === 'High').length; $('lv-med').textContent = fs.filter(f => levelFor(f.score) === 'Medium').length; $('lv-low').textContent = fs.filter(f => levelFor(f.score) === 'Low').length;
+    $('ch-social').textContent = fs.filter(f => f.channel === 'social').length; $('ch-app').textContent = fs.filter(f => f.channel === 'app').length;
+    const tech = {}; fs.forEach(f => (f.techniques || []).forEach(t => tech[t] = (tech[t] || 0) + 1));
+    const top = Object.entries(tech).sort((a, c) => c[1] - a[1]).slice(0, 7), max = top.length ? top[0][1] : 1;
+    $('tech-bars').innerHTML = top.length ? top.map(([t, n]) => `<div><div class="flex justify-between"><span>${esc(t)}</span><span class="text-gray-500">${n}</span></div><div class="bg-gray-100 rounded-full"><div class="bar" style="width:${Math.round(n / max * 100)}%"></div></div></div>`).join('') : '<p class="text-gray-500">No detections yet. Run a scan.</p>';
+    const srcAll = [...(soc ? soc.sources : SOURCES.filter(s => s.type === 'social').map(s => ({ ...s, state: 'idle' }))), ...(app ? app.sources : SOURCES.filter(s => s.type === 'app').map(s => ({ ...s, state: 'idle' })))];
+    $('source-health').innerHTML = srcAll.map(s => { const c = s.state === 'ok' ? 'text-green-600' : s.state === 'unavailable' ? 'text-red-600' : 'text-gray-400'; const t = s.state === 'ok' ? `OK · ${s.count} records` : s.state === 'unavailable' ? 'Unavailable' : s.state === 'disabled' ? 'Disabled' : 'Not scanned'; return `<div class="flex justify-between"><span><i class="fas fa-circle ${c} text-xs mr-2"></i>${esc(s.label)}</span><span class="text-gray-500">${t}</span></div>`; }).join('');
+    $('recent-activity').innerHTML = store.activity.length ? store.activity.slice(0, 6).map(a => `<div class="border-l-4 ${a.result === 'Warning' ? 'border-amber-400' : a.result === 'Failed' ? 'border-red-400' : 'border-blue-400'} pl-3"><p class="font-medium">${esc(a.message)}</p><p class="text-xs text-gray-500">${ago(a.date)}</p></div>`).join('') : '<p class="text-gray-500">No activity yet.</p>';
+    const reviewed = b && brandFindings(b.id).some(f => f.status !== 'Needs Verification');
+    const steps = [[!!b, 'Define the brand profile', 'Official name, domains, logo, social accounts and apps', 'brand'], [!!soc, 'Run a social media scan', 'Find fake profiles, pages and scam accounts', 'social'], [!!app, 'Run an app store scan', 'Find look-alike and unauthorised apps', 'app'], [!!reviewed, 'Review findings', 'Confirm, mark false positives, draft takedowns', 'reports']];
+    $('onboard').innerHTML = steps.map((s, i) => `<li class="flex items-start gap-3"><span class="mt-0.5">${s[0] ? '<i class="fas fa-check-circle text-green-600"></i>' : '<i class="far fa-circle text-gray-400"></i>'}</span><div class="flex-1"><button class="font-medium text-dark hover:text-primary text-left" data-tab="${s[3]}" data-action="goto">${i + 1}. ${esc(s[1])}</button><p class="text-xs text-gray-500">${esc(s[2])}</p></div></li>`).join('');
+  }
+  function renderChannel(ch) {
+    const b = activeBrand(), sum = lastSummary(ch), list = SOURCES.filter(s => s.type === ch);
+    $(ch + '-sources').innerHTML = list.map(s => {
+      const st = sum ? sum.sources.find(x => x.id === s.id) : null, state = st ? st.state : 'idle', cfg = store.sources[s.id];
+      if (!cfg.enabled) return `<span class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-500">○ ${esc(s.label)} · disabled</span>`;
+      if (state === 'unavailable') return `<span class="text-xs px-3 py-1.5 rounded-full bg-red-50 text-red-700">● ${esc(s.label)} · unavailable <button data-action="retry" data-src="${s.id}" class="underline ml-1">Retry</button></span>`;
+      if (state === 'ok') return `<span class="text-xs px-3 py-1.5 rounded-full bg-green-50 text-green-700">● ${esc(s.label)} · ${st.count} records</span>`;
+      return `<span class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-600">○ ${esc(s.label)} · ready${cfg.simulateDown ? ' (outage simulated)' : ''}</span>`;
+    }).join('');
+    const down = sum ? sum.sources.filter(s => s.state === 'unavailable') : [];
+    const banner = $(ch + '-banner'); banner.classList.toggle('hidden', !down.length);
+    if (down.length) banner.innerHTML = `<strong>Partial results.</strong> ${down.map(d => esc(d.label)).join(', ')} could not be reached, so ${down.length > 1 ? 'they were' : 'it was'} skipped. Findings from the other sources are shown (and earlier findings from the unavailable source are kept). Use Retry once the source is back.`;
+    const fs = b ? brandFindings(b.id, ch).sort((x, y) => y.score - x.score) : [];
+    $(ch + '-body').innerHTML = fs.map(f => `<tr class="align-top"><td class="py-3 px-4"><div class="font-medium">${esc(f.name)}</div>${ch === 'social' ? `<div class="text-xs text-gray-500">@${esc(f.handle)}</div>` : `<div class="text-xs text-gray-500">by ${esc(f.publisher || 'unknown')}</div><div class="text-xs text-gray-400">${esc(f.packageId)}</div>`}</td><td class="py-3 px-4 text-sm">${esc(platLabel(f.platform))}</td><td class="py-3 px-4">${levelBadge(f.score)}</td><td class="py-3 px-4">${tagBadges(f)}</td><td class="py-3 px-4">${statusSelect(f)}</td><td class="py-3 px-4"><button data-action="details" data-id="${esc(f.id)}" class="text-primary text-sm underline">Details</button></td></tr>`).join('');
+    $(ch + '-empty').classList.toggle('hidden', fs.length > 0);
+    $(ch + '-empty').textContent = !b ? 'Create or load a brand profile to begin.' : sum ? 'Nothing suspicious found for this brand.' : 'No scan yet – click “Run scan”.';
+    $(ch + '-official-count').textContent = sum ? sum.official.length : 0; $(ch + '-cleared-count').textContent = sum ? sum.cleared.length : 0;
+    $(ch + '-official').innerHTML = sum && sum.official.length ? sum.official.map(o => `<li><i class="fas fa-check text-green-600 mr-1"></i>${esc(o.name)} <span class="text-gray-500">(${esc(o.handle)} · ${esc(platLabel(o.platform))})</span></li>`).join('') : '<li class="text-gray-500">None yet.</li>';
+    $(ch + '-cleared').innerHTML = sum && sum.cleared.length ? sum.cleared.map(o => `<li>${esc(o.name)} <span class="text-gray-500">(${esc(platLabel(o.platform))}) – ${esc(o.reason)}</span></li>`).join('') : '<li class="text-gray-500">None yet.</li>';
+  }
+  function renderReports() {
+    const b = activeBrand(); const q = $('r-search').value.toLowerCase(), ch = $('r-channel').value, lv = $('r-level').value, st = $('r-status').value;
+    const rows = (b ? brandFindings(b.id) : []).filter(f => (!q || `${f.name} ${f.handle} ${f.publisher} ${f.reason}`.toLowerCase().includes(q)) && (ch === 'All' || f.channel === ch) && (lv === 'All' || levelFor(f.score) === lv) && (st === 'All' || f.status === st)).sort((x, y) => y.score - x.score);
+    $('r-count').textContent = `${rows.length} finding${rows.length === 1 ? '' : 's'}`;
+    $('r-body').innerHTML = rows.length ? rows.map(f => `<tr class="align-top"><td class="py-3 px-4"><div class="font-medium">${esc(f.name)}</div><div class="text-xs text-gray-500">${esc(f.reason).slice(0, 140)}</div></td><td class="py-3 px-4 text-sm">${f.channel === 'social' ? 'Social' : 'App'} · ${esc(platLabel(f.platform))}</td><td class="py-3 px-4">${levelBadge(f.score)}</td><td class="py-3 px-4">${statusSelect(f)}</td><td class="py-3 px-4 text-sm whitespace-nowrap">${new Date(f.firstSeen).toLocaleDateString()}</td><td class="py-3 px-4"><button data-action="details" data-id="${esc(f.id)}" class="text-primary text-sm underline">Details</button></td></tr>`).join('') : '<tr><td colspan="6" class="p-6 text-center text-gray-500">No findings match. Run a scan first.</td></tr>';
+  }
+  function renderLogs() {
+    const q = $('logs-search').value.trim().toLowerCase(), t = $('logs-type').value;
+    const rows = store.activity.filter(a => (!q || `${a.message} ${a.type} ${a.result}`.toLowerCase().includes(q)) && (t === 'All' || a.type === t));
+    $('logs-body').innerHTML = rows.map(a => `<tr><td class="py-3 px-4 text-sm whitespace-nowrap">${esc(new Date(a.date).toLocaleString())}</td><td class="py-3 px-4"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">${esc(a.type)}</span></td><td class="py-3 px-4 text-sm">${esc(a.message)}</td><td class="py-3 px-4 text-sm ${a.result === 'Failed' ? 'text-red-600' : a.result === 'Warning' ? 'text-amber-600' : 'text-green-700'}">${esc(a.result)}</td></tr>`).join('');
+    $('logs-empty').classList.toggle('hidden', rows.length > 0);
+  }
+  function renderSettings() {
+    $('s-sources').innerHTML = SOURCES.map(s => `<tr><td class="py-2 px-3 font-medium">${esc(s.label)}</td><td class="py-2 px-3"><input type="checkbox" data-change="src" data-src="${s.id}" data-field="enabled" ${store.sources[s.id].enabled ? 'checked' : ''}></td><td class="py-2 px-3"><input type="checkbox" data-change="src" data-src="${s.id}" data-field="simulateDown" ${store.sources[s.id].simulateDown ? 'checked' : ''}></td><td class="py-2 px-3 text-gray-500">Simulated feed + JSON import · live API not configured</td></tr>`).join('');
+    $('s-sens').innerHTML = [['strict', 'Strict', 'Flag from score 15 – more alerts, fewer misses'], ['balanced', 'Balanced', 'Flag from score 25 – recommended'], ['lenient', 'Lenient', 'Flag from score 35 – fewer alerts, may miss weak signals']].map(([v, l, d]) => `<label class="flex items-start gap-2"><input type="radio" name="sens" value="${v}" ${store.sensitivity === v ? 'checked' : ''} class="mt-1"><span><strong>${l}</strong><br><span class="text-xs text-gray-500">${d}</span></span></label>`).join('');
+    $('s-allow').textContent = store.allow.length;
+  }
+  function renderAll() { renderBrandSelector(); renderBrandList(); renderDashboard(); renderChannel('social'); renderChannel('app'); renderReports(); renderLogs(); renderSettings(); if (openId) renderModal(); }
+
+  // ---------- details modal ----------
+  let openId = null;
+  function takedownDraft(f, brand) {
+    const sig = (f.signals || []).filter(s => s.pts > 0).map(s => `  - ${s.label}`).join('\n');
+    const officials = f.channel === 'social' ? brand.social.filter(o => o.platform === f.platform).map(o => '@' + o.handle).join(', ') || 'see brand website' : brand.apps.map(a => `${a.name} (${a.packageId || a.publisher})`).join('; ');
+    return `Subject: Impersonation report – ${f.name} (${platLabel(f.platform)})\n\nHello ${platLabel(f.platform)} Trust & Safety team,\n\nI am writing on behalf of ${brand.name} (${brand.domains.join(', ')}). The ${f.channel === 'social' ? 'account' : 'app'} below appears to impersonate our brand:\n\n  ${f.channel === 'social' ? 'Profile' : 'Listing'}: ${f.name}${f.handle ? ' (@' + f.handle + ')' : ''}${f.url ? '\n  URL: ' + f.url : ''}${f.packageId ? '\n  Package/bundle ID: ' + f.packageId : ''}${f.publisher ? '\n  Publisher: ' + f.publisher : ''}\n\nWhy we believe it is not authorised:\n${sig}\n\nOur official ${f.channel === 'social' ? 'accounts on this platform' : 'apps'}: ${officials}\n\nPlease review it under your impersonation / trademark policy and let us know the outcome. Proof of authorisation can be provided on request.\n\n[Review for accuracy before sending – RiskShield scores are triage aids, not verdicts.]`;
+  }
+  function renderModal() {
+    const f = store.findings.find(x => x.id === openId), brand = f && store.brands.find(b => b.id === f.brandId); if (!f || !brand) { closeModal(); return; }
+    $('modal-title').textContent = f.name;
+    const r = f.rec || {}, lvl = levelFor(f.score);
+    const dist = RS.hamming(brand.logoHash, r.logoHash);
+    const rows = f.channel === 'social' ? [
+      ['Display name', brand.name, f.name], ['Handle', brand.social.filter(o => o.platform === f.platform).map(o => '@' + o.handle).join(', ') || '—', '@' + f.handle],
+      ['Linked website', brand.domains.join(', '), r.link || '—'], ['Logo / image', brand.logoHash ? 'fingerprint ' + brand.logoHash : '—', dist === null ? '—' : `distance ${dist}/64 ${dist <= 8 ? '(near-identical)' : dist <= 14 ? '(similar)' : ''}`],
+      ['Verified', 'Yes (typical)', r.verified ? 'Yes' : 'No'], ['Account age', '—', r.ageDays != null ? r.ageDays + ' days' : '—']
+    ] : [
+      ['App name', brand.apps.map(a => a.name).join(' / ') || brand.name, f.name], ['Publisher', [...new Set(brand.apps.map(a => a.publisher))].join(' / ') || '—', f.publisher || '—'],
+      ['Package / bundle ID', brand.apps.map(a => a.packageId).filter(Boolean).join(', ') || '—', f.packageId || '—'], ['Logo / icon', brand.logoHash ? 'fingerprint ' + brand.logoHash : '—', dist === null ? '—' : `distance ${dist}/64`],
+      ['Permissions', '—', (r.permissions || []).join(', ') || '—'], ['Downloads / age', '—', `${r.downloads != null ? r.downloads.toLocaleString() : '—'} · ${r.ageDays != null ? r.ageDays + ' days' : '—'}`]
+    ];
+    const actions = f.channel === 'social' ? ['Verify the profile manually (creation date, posts, linked sites) before acting', 'Report the account through the platform\'s impersonation / fake-page form', 'Preserve screenshots and URLs as evidence', 'Warn customers through your official channels if scam activity is confirmed'] : ['Check the store listing and developer page manually', 'Report the app through the store\'s impersonation / policy-violation form', 'If the package ID or publisher mimics yours, include trademark evidence', 'Alert customers to install only from your official app links'];
+    $('modal-body').innerHTML = `<div class="flex flex-wrap items-center gap-3 mb-4">${levelBadge(f.score)}<span class="text-gray-600">${f.channel === 'social' ? 'Social' : 'App'} · ${esc(platLabel(f.platform))}</span><span class="text-gray-400 text-xs">Source: ${esc(f.source)}</span><span class="ml-auto">${statusSelect(f)}</span></div>
+      <h4 class="font-semibold text-dark mb-2">Official vs. candidate</h4>
+      <div class="overflow-x-auto mb-5"><table class="min-w-full text-sm border"><thead class="bg-gray-100"><tr><th class="py-2 px-3 text-left"></th><th class="py-2 px-3 text-left">Official (profile)</th><th class="py-2 px-3 text-left">Candidate</th></tr></thead><tbody class="divide-y">${rows.map(x => `<tr><td class="py-2 px-3 text-gray-500">${esc(x[0])}</td><td class="py-2 px-3 break-all">${esc(x[1])}</td><td class="py-2 px-3 break-all font-medium">${esc(x[2])}</td></tr>`).join('')}</tbody></table></div>
+      <h4 class="font-semibold text-dark mb-2">Evidence (score ${f.score}/100, ${lvl})</h4>
+      <ul class="space-y-1 mb-5">${(f.signals || []).map(s => `<li><span class="inline-block w-12 font-mono ${s.pts < 0 ? 'text-green-700' : 'text-gray-700'}">${s.pts > 0 ? '+' : ''}${s.pts}</span> <span class="inline-block bg-slate-100 text-xs px-2 py-0.5 rounded mr-1">${esc(s.tag)}</span>${esc(s.label)}</li>`).join('')}</ul>
+      <h4 class="font-semibold text-dark mb-2">Recommended actions</h4>
+      <ul class="list-disc pl-5 text-gray-700 mb-5 space-y-1">${actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>
+      <h4 class="font-semibold text-dark mb-2">Takedown / report draft</h4>
+      <textarea id="draft" rows="10" class="w-full px-3 py-2 border rounded-lg text-xs font-mono" readonly>${esc(takedownDraft(f, brand))}</textarea>
+      <div class="flex flex-wrap gap-2 mt-3"><button data-action="copy-draft" class="bg-primary text-white px-4 py-2 rounded-lg font-medium">Copy draft</button><button data-action="close-modal" class="border border-gray-300 px-4 py-2 rounded-lg font-medium">Close</button></div>
+      <p class="text-xs text-gray-500 mt-3">This is a rule-based triage score from the data provided. It does not prove an account or app is malicious – a person should verify before reporting.</p>`;
+  }
+  function openDetails(id) { openId = id; renderModal(); $('modal').classList.remove('hidden'); }
+  function closeModal() { openId = null; $('modal').classList.add('hidden'); }
+
+  function setStatus(id, status) {
+    const f = store.findings.find(x => x.id === id); if (!f || !STATUSES.includes(status)) return;
+    const was = f.status; f.status = status;
+    if (status === 'False Positive' && !store.allow.includes(f.key)) store.allow.push(f.key);
+    if (was === 'False Positive' && status !== 'False Positive') store.allow = store.allow.filter(k => k !== f.key);
+    addActivity(`Finding status updated: ${f.name} → ${status}${status === 'False Positive' ? ' (added to allow-list)' : ''}`, 'Finding');
+    persist(); renderAll();
+  }
+
+  // ---------- architecture diagram ----------
+  function renderArch() {
+    const W = 1000, H = 600; let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RiskShield architecture diagram" font-family="Inter, sans-serif" style="width:100%;height:auto">`;
+    s += `<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>`;
+    const col = (x, w, t) => `<rect x="${x}" y="8" width="${w}" height="584" rx="12" fill="#f8fafc" stroke="#cbd5e1"/><text x="${x + w / 2}" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">${t}</text>`;
+    const box = (x, y, w, h, lines, fill, stroke, dash) => { const ty = y + h / 2 - (lines.length - 1) * 7 + 4; return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill || '#fff'}" stroke="${stroke || '#94a3b8'}" ${dash ? 'stroke-dasharray="4 3"' : ''}/>` + lines.map((l, i) => `<text x="${x + w / 2}" y="${ty + i * 14}" text-anchor="middle" font-size="11" fill="#1e293b">${esc(l)}</text>`).join(''); };
+    const arrow = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>`;
+    s += col(8, 176, '1 · Data sources') + col(196, 160, '2 · Collection') + col(368, 316, '3 · Detection engine') + col(696, 150, '4 · Storage') + col(858, 134, '5 · Outputs');
+    ['X / Twitter', 'Instagram', 'Facebook', 'LinkedIn', 'Google Play', 'Apple App Store'].forEach((t, i) => { s += box(20, 48 + i * 50, 152, 40, [t, 'API / feed (simulated)'], '#fff', '#94a3b8', true); });
+    s += box(20, 356, 152, 44, ['JSON / CSV import', 'real candidate data'], '#eff6ff', '#2563eb');
+    s += box(20, 412, 152, 44, ['Manual check', 'paste one profile / app'], '#eff6ff', '#2563eb');
+    s += box(208, 60, 136, 56, ['Source adapters', '(one per platform)']) + box(208, 132, 136, 46, ['Rate limits', 'retries / backoff']) + box(208, 194, 136, 62, ['Source health', 'graceful degradation', 'partial-results banner'], '#fffbeb', '#f59e0b') + box(208, 272, 136, 56, ['Normalise to one', 'record schema']);
+    s += box(380, 46, 292, 44, ['Brand Profile: official handles, package IDs,', 'publishers, domains, logo, description'], '#ecfdf5', '#10b981');
+    s += box(380, 104, 292, 52, ['A · Official-asset exclusion (before scoring)', 'matches → marked official, never flagged'], '#ecfdf5', '#10b981');
+    s += box(380, 168, 292, 56, ['B · Look-alike name engine', 'homoglyphs · swaps / typos · spacing · added words']);
+    s += box(380, 236, 292, 38, ['C · Logo fingerprint (dHash + Hamming distance)']);
+    s += box(380, 286, 292, 38, ['D · Link / domain analysis (look-alike, foreign, shortener)']);
+    s += box(380, 336, 292, 38, ['E · Description similarity + scam language']);
+    s += box(380, 386, 292, 52, ['F · App checks', 'publisher · package ID · permissions · age / installs']);
+    s += box(380, 450, 292, 56, ['G · Weighted score + evidence list', 'brand-relevance gate · sensitivity · allow-list'], '#eff6ff', '#2563eb');
+    s += box(380, 520, 292, 56, ['Why fewer false alarms:', 'short names exact-only · verified badge lowers score', 'fan / news wording scored low'], '#fff', '#cbd5e1');
+    [90, 156, 224, 274, 324, 374, 438].forEach((y, i) => { s += arrow(526, y, 526, y + 14 + (i === 5 ? 12 : 0)); });
+    ['Brand profiles', 'Official asset registry', 'Findings + status', 'Allow-list (false positives)', 'Audit log'].forEach((t, i) => { s += box(708, 48 + i * 56, 126, 44, [t], i === 1 ? '#ecfdf5' : '#fff', i === 1 ? '#10b981' : '#94a3b8'); });
+    s += `<text x="771" y="352" text-anchor="middle" font-size="10" fill="#475569">Prototype: localStorage</text><text x="771" y="368" text-anchor="middle" font-size="10" fill="#475569">Production: Postgres +</text><text x="771" y="382" text-anchor="middle" font-size="10" fill="#475569">object storage</text>`;
+    ['Dashboard', 'Review queue', 'Takedown drafts', 'CSV export', 'Alerts (email / webhook)'].forEach((t, i) => { s += box(870, 48 + i * 56, 110, 44, [t]); });
+    s += arrow(172, 200, 208, 200) + arrow(344, 200, 380, 200) + arrow(672, 200, 708, 200) + arrow(834, 200, 870, 200);
+    s += `<path d="M708 126 C 690 126 690 126 674 126" stroke="#10b981" stroke-width="1.5" fill="none" marker-end="url(#arr)"/><text x="690" y="114" text-anchor="middle" font-size="9" fill="#047857">official</text>`;
+    s += `</svg>`;
+    $('arch-svg').innerHTML = s;
+  }
+
+  // ---------- import ----------
+  const SAMPLE_IMPORT = JSON.stringify([
+    { type: 'social', platform: 'instagram', name: 'NovaPay Official Giveaway', handle: 'novapay_giveaway_2026', link: 'https://novapay-rewards.top/claim', bio: 'Claim your free bonus now! DM us to verify your account.', ageDays: 9, followers: 120 },
+    { type: 'app', platform: 'googleplay', name: 'NovaPay Loan Fast', publisher: 'QuickCash Labs', packageId: 'com.quickcash.novapayloan', description: 'Instant loans. Enter your bank details to get started.', permissions: ['READ_SMS', 'READ_CONTACTS'], ageDays: 14, downloads: 300 }
+  ], null, 2);
+  function importRecords() {
+    const msg = $('s-import-msg'); let data;
+    try { data = JSON.parse($('s-import').value); } catch (e) { msg.textContent = 'Invalid JSON: ' + e.message; msg.className = 'text-sm mt-2 text-red-600'; return; }
+    if (!Array.isArray(data) || !data.length) { msg.textContent = 'Expected a non-empty JSON array of records.'; msg.className = 'text-sm mt-2 text-red-600'; return; }
+    if (data.length > 500) { msg.textContent = 'Import is limited to 500 records at a time.'; msg.className = 'text-sm mt-2 text-red-600'; return; }
+    const ok = [], bad = []; const s = (v, n = 500) => String(v == null ? '' : v).slice(0, n);
+    data.forEach((r, i) => {
+      if (!r || typeof r !== 'object') { bad.push(`#${i + 1}: not an object`); return; }
+      const type = r.type === 'social' || r.type === 'app' ? r.type : '', platform = platId(r.platform);
+      if (!type) { bad.push(`#${i + 1}: type must be "social" or "app"`); return; }
+      if (!platform || SOURCES.find(x => x.id === platform).type !== type) { bad.push(`#${i + 1}: platform "${s(r.platform, 30)}" is not valid for ${type}`); return; }
+      if (!r.name) { bad.push(`#${i + 1}: name is required`); return; }
+      const num = v => (v == null || v === '' || isNaN(Number(v))) ? null : Math.max(0, Number(v));
+      ok.push({ type, platform, id: `imp-${Date.now()}-${i}`, name: s(r.name, 200), handle: s(r.handle, 100), url: s(r.url), link: s(r.link), bio: s(r.bio, 2000), description: s(r.description, 4000), publisher: s(r.publisher, 200), packageId: s(r.packageId, 200), permissions: Array.isArray(r.permissions) ? r.permissions.slice(0, 30).map(x => s(x, 80)) : [], verified: !!r.verified, ageDays: num(r.ageDays), followers: num(r.followers), downloads: num(r.downloads), logoHash: /^[0-9a-f]{16}$/i.test(r.logoHash || '') ? r.logoHash.toLowerCase() : undefined });
+    });
+    store.imported.push(...ok); addActivity(`Imported ${ok.length} candidate record(s)${bad.length ? `, ${bad.length} rejected` : ''}`, 'System', bad.length ? 'Warning' : 'Success'); persist(); renderAll();
+    msg.textContent = `Imported ${ok.length} record(s).${bad.length ? ' Rejected: ' + bad.slice(0, 4).join('; ') + (bad.length > 4 ? '…' : '') : ''} Run a scan to analyse them.`;
+    msg.className = 'text-sm mt-2 ' + (bad.length ? 'text-amber-700' : 'text-green-700');
+  }
+
+  // ---------- CSV ----------
+  const csvCell = v => { let t = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
+  function downloadCsv(name, rows) { const csv = rows.map(r => r.map(csvCell).join(',')).join('\r\n'); const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+
+  // ---------- events ----------
+  document.addEventListener('click', e => {
+    const tabBtn = e.target.closest('[data-tab]'); if (tabBtn && !tabBtn.dataset.action) { switchTab(tabBtn.dataset.tab); return; }
+    const el = e.target.closest('[data-action]'); if (!el) { if (e.target.id === 'modal') closeModal(); return; }
+    const a = el.dataset.action, id = el.dataset.id;
+    switch (a) {
+      case 'goto': switchTab(el.dataset.tab); break;
+      case 'get-started': switchTab(store.brands.length ? 'dashboard' : 'brand'); if (!store.brands.length) toast('Start by loading the demo brand or entering your own.'); break;
+      case 'run-all': runScan('social').then(() => runScan('app')); break;
+      case 'run-social': runScan('social'); break;
+      case 'run-app': runScan('app'); break;
+      case 'retry': { const src = SOURCES.find(s => s.id === el.dataset.src); runScan(src.type, [src.id]); break; }
+      case 'add-social': addSocialRow({ platform: 'x' }); break;
+      case 'add-app': addAppRow({ store: 'googleplay' }); break;
+      case 'rm-row': el.parentElement.remove(); break;
+      case 'save-brand': saveBrand(); break;
+      case 'clear-brand': clearForm(); break;
+      case 'demo-brand': loadDemoBrand(); break;
+      case 'use-brand': store.activeBrandId = id; persist(); renderAll(); break;
+      case 'edit-brand': { const b = store.brands.find(x => x.id === id); if (b) { editingId = b.id; store.activeBrandId = b.id; fillForm(b); persist(); renderAll(); window.scrollTo(0, 0); } break; }
+      case 'delete-brand': { const b = store.brands.find(x => x.id === id); if (b && confirm(`Delete brand "${b.name}" and its findings?`)) { store.brands = store.brands.filter(x => x.id !== id); store.findings = store.findings.filter(f => f.brandId !== id); ['social', 'app'].forEach(c => { if (store.lastScan[c] && store.lastScan[c].brandId === id) store.lastScan[c] = null; }); if (store.activeBrandId === id) store.activeBrandId = store.brands[0] ? store.brands[0].id : ''; addActivity(`Brand profile deleted: ${b.name}`, 'Brand'); if (editingId === id) clearForm(); persist(); renderAll(); } break; }
+      case 'manual-social': manualCheck('social'); break;
+      case 'manual-app': manualCheck('app'); break;
+      case 'details': openDetails(id); break;
+      case 'close-modal': closeModal(); break;
+      case 'copy-draft': { const t = $('draft'); t.select(); (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(() => toast('Draft copied.'), () => { document.execCommand('copy'); toast('Draft copied.'); }); break; }
+      case 'export-findings': { const b = activeBrand(); if (!b) return; downloadCsv('riskshield-findings.csv', [['Brand', 'Channel', 'Platform', 'Name', 'Handle / Package', 'Publisher', 'URL', 'Score', 'Level', 'Status', 'Signals', 'First seen']].concat(brandFindings(b.id).map(f => [f.brandName, f.channel, platLabel(f.platform), f.name, f.handle || f.packageId, f.publisher, f.url, f.score, levelFor(f.score), f.status, (f.signals || []).filter(s => s.pts > 0).map(s => s.label).join(' | '), f.firstSeen]))); break; }
+      case 'export-logs': downloadCsv('riskshield-system-logs.csv', [['Timestamp', 'Event Type', 'Event Description', 'Result']].concat(store.activity.map(x => [x.date, x.type, x.message, x.result]))); addActivity('System logs exported to CSV', 'System'); persist(); renderLogs(); break;
+      case 'refresh-logs': renderLogs(); break;
+      case 'import': importRecords(); break;
+      case 'import-sample': $('s-import').value = SAMPLE_IMPORT; break;
+      case 'clear-import': store.imported = []; addActivity('Imported records removed', 'System'); persist(); renderAll(); $('s-import-msg').textContent = 'Imported records removed.'; break;
+      case 'reset': if (confirm('Delete all brands, findings, logs and settings stored in this browser?')) { localStorage.removeItem(KEY); store = readStore(); clearForm(); renderAll(); switchTab('dashboard'); toast('Local data reset.'); } break;
+    }
+  });
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.id === 'active-brand') { store.activeBrandId = t.value; persist(); renderAll(); return; }
+    if (t.dataset.change === 'status') { setStatus(t.dataset.id, t.value); return; }
+    if (t.dataset.change === 'src') { store.sources[t.dataset.src][t.dataset.field] = t.checked; addActivity(`Source ${platLabel(t.dataset.src)}: ${t.dataset.field === 'enabled' ? (t.checked ? 'enabled' : 'disabled') : (t.checked ? 'outage simulation on' : 'outage simulation off')}`, 'Source'); persist(); renderAll(); return; }
+    if (t.name === 'sens') { store.sensitivity = t.value; addActivity(`Detection sensitivity set to ${t.value}`, 'System'); persist(); renderAll(); toast('Sensitivity updated. Re-run scans to apply it to new results.'); }
+  });
+  ['r-search', 'r-channel', 'r-level', 'r-status'].forEach(id => $(id).addEventListener('input', renderReports));
+  ['logs-search', 'logs-type'].forEach(id => $(id).addEventListener('input', renderLogs));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ---------- init ----------
+  $('r-status').innerHTML = '<option value="All">All statuses</option>' + STATUSES.map(s => `<option>${esc(s)}</option>`).join('');
+  fillForm({});
+  if (!activeBrand() && store.brands.length) store.activeBrandId = store.brands[0].id;
+  renderAll(); switchTab('dashboard');
+})();
+</script>
+</body>
+</html>
